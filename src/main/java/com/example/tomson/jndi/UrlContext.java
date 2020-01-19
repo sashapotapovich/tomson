@@ -26,6 +26,7 @@ public class UrlContext implements Context {
 
     public UrlContext(final FastHashtable<String, Object> environment) {
         this.environment = environment;
+        manager = new ConnectionManager();
         urlFormString = (String) environment.get("java.naming.provider.url");
     }
 
