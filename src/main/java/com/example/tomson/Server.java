@@ -33,10 +33,9 @@ public class Server {
         int port = resolvePort();
         log.info("Starting Server on the port - {}", port);
         httpServer = HttpServer.create(new InetSocketAddress(port), 0);
-        HttpContext context = httpServer.createContext("/hello");
-        HttpContext test = httpServer.createContext("/");
-        context.setHandler(this::handleRequest);
-        test.setHandler(this::handleTestRequest);
+        HttpContext server = httpServer.createContext("/");
+        HttpContext jndi = httpServer.createContext("/jndi");
+        jndi.setHandler(this::handleTestRequest);
         httpServer.start();
     }
 
@@ -45,20 +44,12 @@ public class Server {
         URL url = ClassUtil.getClassLoader().getResource("application.properties");
         Path path = Paths.get(url.toURI());
         Optional<Integer> port = Files.readAllLines(path, StandardCharsets.UTF_8)
-                                       .stream().filter(s -> s.startsWith("server.port"))
+                                       .stream().parallel().filter(s -> s.startsWith("server.port"))
                                        .map(s -> s.replace(" ", "")
                                                   .substring("server.port=".length()))
                                        .map(Integer::valueOf)
                                        .findFirst();
         return port.orElse(8080);
-    }
-
-    private void handleRequest(HttpExchange exchange) throws IOException {
-        String response = "Hello there standart!";
-        exchange.sendResponseHeaders(200, response.getBytes().length);//response code and length
-        OutputStream os = exchange.getResponseBody();
-        os.write(response.getBytes());
-        os.close();
     }
 
     private void handleTestRequest(HttpExchange exchange) throws IOException {
@@ -73,12 +64,15 @@ public class Server {
             String line = body.readLine();
             log.info(line);
         }
+        String query = exchange.getRequestURI().getQuery();
+        log.error("Query - {}", query);
+        log.error("URI - {}", exchange.getRequestURI().toASCIIString());
         exchange.getRequestHeaders()
                 .forEach((key, value)
                                  -> log.info("Headers: key - " + key + "values - " 
                                                      + value.stream()
                                                             .reduce(" - ", String::concat)));
-        exchange.sendResponseHeaders(200, 0);
+        exchange.sendResponseHeaders(200, "value".getBytes().length);
         OutputStream responseBody = exchange.getResponseBody();
         exchange.setStreams(null, responseBody);
         responseBody.write("value".getBytes());

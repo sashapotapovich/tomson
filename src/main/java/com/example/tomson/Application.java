@@ -7,7 +7,7 @@ class Application {
 
     public static void main(String[] args) {
         ApplicationContext applicationContext = new ApplicationContext("com.example.tomson");
-        BeanFactory beanFactory = applicationContext.getBeanFactory();
+        //BeanFactory beanFactory = applicationContext.getBeanFactory();
         /*Server server = (Server) beanFactory.getBean("server");
         server.init(8080);*/
     }
