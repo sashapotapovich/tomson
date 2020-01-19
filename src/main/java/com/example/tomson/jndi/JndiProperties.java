@@ -18,4 +18,8 @@ public class JndiProperties {
         return props.get(name);
     }
     
+    public void setJndiProperty(String name, Object object) {
+        props.put(name, object);
+    }
+    
 }

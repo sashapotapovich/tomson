@@ -1,5 +1,6 @@
 package com.example.tomson.jndi;
 
+import com.example.tomson.manager.ConnectionManager;
 import com.example.tomson.util.FastHashtable;
 import com.example.tomson.util.ParameterStringBuilder;
 import lombok.SneakyThrows;
@@ -21,9 +22,12 @@ public class UrlContext implements Context {
 
     private static final Logger log = LoggerFactory.getLogger(UrlContext.class);
     private final FastHashtable<String, Object> environment;
+    private final String urlFormString;
+    private ConnectionManager manager;
 
     public UrlContext(final FastHashtable<String, Object> environment) {
         this.environment = environment;
+        urlFormString = (String) environment.get("java.naming.provider.url");
     }
 
     @Override
@@ -33,23 +37,23 @@ public class UrlContext implements Context {
         stringIterator.forEachRemaining(str -> sb.append(str).append('.'));
         return lookup(sb.toString().substring(0, sb.length() - 1));
     }
-
-    @SneakyThrows
+    
     @Override
     public Object lookup(String name) {
-        String urlFormString = (String) environment.get("java.naming.provider.url");
-        URL url = new URL(urlFormString + "/jndi?name=" + name);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("GET");
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuilder lookup = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) {
-            lookup.append(inputLine);
+        HttpURLConnection con = manager.getConnection(urlFormString + "/jndi?name=" + name);
+        if (con != null) {
+            con.setRequestMethod("GET");
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuilder lookup = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                lookup.append(inputLine);
+            }
+            in.close();
+            con.disconnect();
+            return lookup.toString();
         }
-        in.close();
-        con.disconnect();
-        return lookup.toString();
+        return null;
     }
 
     @Override
