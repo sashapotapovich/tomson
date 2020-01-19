@@ -8,10 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.naming.*;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -42,49 +41,64 @@ public class UrlContext implements Context {
     public Object lookup(String name) {
         HttpURLConnection con = manager.getConnection(urlFormString + "/jndi?name=" + name);
         if (con != null) {
-            con.setRequestMethod("GET");
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuilder lookup = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                lookup.append(inputLine);
+            try {
+                con.setRequestMethod("GET");
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuilder lookup = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    lookup.append(inputLine);
+                }
+                in.close();
+                con.disconnect();
+                return lookup.toString();
+            } catch (ProtocolException e) {
+                log.error("{}", e.getMessage());
+                e.printStackTrace();
+            } catch (IOException e) {
+                log.error("Unable to send data to the server, {}", e.getMessage());
+                e.printStackTrace();
             }
-            in.close();
-            con.disconnect();
-            return lookup.toString();
         }
         return null;
     }
 
     @Override
     public void bind(Name name, Object obj) {
-
+        StringBuilder sb = new StringBuilder();
+        Iterator<String> stringIterator = name.getAll().asIterator();
+        stringIterator.forEachRemaining(str -> sb.append(str).append('.'));
+        bind(sb.toString(), obj);
     }
-
-    @SneakyThrows
+    
     @Override
     public void bind(String name, Object obj) {
-        String urlFormString = (String) environment.get("java.naming.provider.url");
-        URL url = new URL(urlFormString + "/jndi");
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("key", name);
-        parameters.put("value", obj);
-        con.setDoOutput(true);
-        DataOutputStream out = new DataOutputStream(con.getOutputStream());
-        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
-        out.flush();
-        out.close();
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuilder lookup = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) {
-            lookup.append(inputLine);
+        HttpURLConnection con = manager.getConnection(urlFormString + "/jndi");
+        if (con != null) {
+            try {
+                con.setRequestMethod("POST");
+                Map<String, Object> parameters = new HashMap<>();
+                parameters.put("key", name);
+                parameters.put("value", obj);
+                con.setDoOutput(true);
+                DataOutputStream out = new DataOutputStream(con.getOutputStream());
+                out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+                out.flush();
+                out.close();
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuilder lookup = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    lookup.append(inputLine);
+                }
+                log.info("Bind - {}", lookup);
+                in.close();
+                con.disconnect();
+            } catch (IOException e) {
+                log.error("{}", e.getMessage());
+                e.printStackTrace();
+            }
         }
-        log.info("Bind - {}", lookup);
-        in.close();
-        con.disconnect();
     }
 
     @Override
