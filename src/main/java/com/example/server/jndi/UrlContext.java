@@ -149,12 +149,12 @@ public class UrlContext implements Context {
 
     @Override
     public void rename(Name oldName, Name newName) {
-
+        //Not implemented yet
     }
 
     @Override
     public void rename(String oldName, String newName) {
-
+        //Not implemented yet
     }
 
     @Override
@@ -179,12 +179,12 @@ public class UrlContext implements Context {
 
     @Override
     public void destroySubcontext(Name name) {
-
+        //Not implemented yet
     }
 
     @Override
     public void destroySubcontext(String name) {
-
+        //Not implemented yet
     }
 
     @Override
@@ -244,7 +244,7 @@ public class UrlContext implements Context {
 
     @Override
     public void close() {
-
+        environment.clear();
     }
 
     @Override
