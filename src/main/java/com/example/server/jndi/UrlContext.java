@@ -81,9 +81,9 @@ public class UrlContext implements Context {
         if (con != null) {
             try {
                 con.setRequestMethod("POST");
-                Gson gson = new Gson();
                 Map<String, Object> parameters = new HashMap<>();
                 parameters.put(name, obj);
+                Gson gson = new Gson();
                 String s = gson.toJson(parameters, HashMap.class);
                 log.error("Converted JSON - {}", s);
                 con.setDoOutput(true);
@@ -102,29 +102,49 @@ public class UrlContext implements Context {
                 con.disconnect();
             } catch (IOException e) {
                 log.error("{}", e.getMessage());
-                e.printStackTrace();
             }
         }
     }
 
     @Override
     public void rebind(Name name, Object obj) {
-
+        bind(name, obj);
     }
 
     @Override
     public void rebind(String name, Object obj) {
-
+        bind(name, obj);
     }
 
     @Override
     public void unbind(Name name) {
-
+        StringBuilder sb = new StringBuilder();
+        Iterator<String> stringIterator = name.getAll().asIterator();
+        stringIterator.forEachRemaining(str -> sb.append(str).append('.'));
+        unbind(sb.toString());
     }
 
     @Override
     public void unbind(String name) {
-
+        HttpURLConnection con = manager.getConnection(urlFormString + "/jndi?name=" + name);
+        if (con != null) {
+            try {
+                con.setRequestMethod("DELETE");
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuilder lookup = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    lookup.append(inputLine);
+                }
+                in.close();
+                con.disconnect();
+                log.debug("Result - {}", lookup);
+            } catch (ProtocolException e) {
+                log.error("{}", e.getMessage());
+            } catch (IOException e) {
+                log.error("Unable to send data to the server, {}", e.getMessage());
+            }
+        }
     }
 
     @Override

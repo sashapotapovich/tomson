@@ -1,13 +1,12 @@
-package com.example.server;
+package com.client;
 
 import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import lombok.SneakyThrows;
 
 public class RemoteJndiClient {
-    @SneakyThrows
+    
     public static void main(String[] args) throws NamingException {
         Properties env = new Properties();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.example.server.jndi.RemoteInitialContextFactory");
@@ -18,5 +17,8 @@ public class RemoteJndiClient {
         Object lookup = remoteContext.lookup("java:comp/env/test");
         System.out.println(lookup.getClass());
         System.out.println(lookup);
+        remoteContext.unbind("java:comp/env/test");
+        Object lookup2 = remoteContext.lookup("java:comp/env/test");
+        System.out.println(lookup2.getClass());
     }
 }
