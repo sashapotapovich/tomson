@@ -85,7 +85,7 @@ public class UrlContext implements Context {
                 parameters.put(name, obj);
                 Gson gson = new Gson();
                 String s = gson.toJson(parameters, HashMap.class);
-                log.error("Converted JSON - {}", s);
+                log.debug("Converted JSON - {}", s);
                 con.setDoOutput(true);
                 DataOutputStream out = new DataOutputStream(con.getOutputStream());
                 out.writeBytes(s);

@@ -66,6 +66,8 @@ public class Server {
     private void handleTestRequest(HttpExchange exchange) throws IOException {
         log.info("New Connection was established, Method - {}", exchange.getRequestMethod());
         Object jndiProperty = new Object();
+        String urlParam;
+        int rCode;
         switch (exchange.getRequestMethod()) {
             case "POST":
                 StringBuilder sb = new StringBuilder();
@@ -76,23 +78,32 @@ public class Server {
                 Gson gson = new Gson();
                 HashMap<String, Object> hashMap = gson.fromJson(sb.toString(), HashMap.class);
                 hashMap.forEach((key, value) -> jndiProperties.setJndiProperty(key, value));
+                rCode = 201;
                 body.close();
                 break;
-            case "GET": {
-                String query2 = exchange.getRequestURI().getQuery();
-                jndiProperty = jndiProperties.getJndiProperty(query2.replace("name=", ""));
+            case "GET":
+                urlParam = exchange.getRequestURI().getQuery();
+                jndiProperty = jndiProperties.getJndiProperty(urlParam.replace("name=",
+                                                                               ""));
+                rCode = 200;
                 break;
-            }
-            case "DELETE": {
-                String query2 = exchange.getRequestURI().getQuery();
-                jndiProperty = jndiProperties.removeJndiProperty(query2.replace("name=", ""));
+            
+            case "DELETE":
+                urlParam = exchange.getRequestURI().getQuery();
+                jndiProperty = jndiProperties.removeJndiProperty(urlParam.replace("name=",
+                                                             ""));
+                rCode = 200;
                 break;
-            }
+            default:
+                jndiProperty = null;
+                rCode = 405;
+                log.error("Unexpected Method");
+                
         }
         if (jndiProperty != null) {
             Gson gson = new Gson();
             String responseBodyJson = gson.toJson(jndiProperty);
-            exchange.sendResponseHeaders(200, responseBodyJson.getBytes().length);
+            exchange.sendResponseHeaders(rCode, responseBodyJson.getBytes().length);
             OutputStream responseBody = exchange.getResponseBody();
             exchange.setStreams(null, responseBody);
             responseBody.write(responseBodyJson.getBytes());
