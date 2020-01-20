@@ -1,21 +1,26 @@
-package com.example.tomson.jndi;
+package com.example.server.jndi;
 
-import com.example.tomson.manager.ConnectionManager;
-import com.example.tomson.util.FastHashtable;
-import com.example.tomson.util.ParameterStringBuilder;
-import lombok.SneakyThrows;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.naming.*;
-import java.io.*;
+import com.example.server.manager.ConnectionManager;
+import com.example.server.util.FastHashtable;
+import com.google.gson.Gson;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import javax.naming.Binding;
+import javax.naming.Context;
+import javax.naming.Name;
+import javax.naming.NameClassPair;
+import javax.naming.NameParser;
+import javax.naming.NamingEnumeration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UrlContext implements Context {
 
@@ -37,7 +42,7 @@ public class UrlContext implements Context {
         stringIterator.forEachRemaining(str -> sb.append(str).append('.'));
         return lookup(sb.toString().substring(0, sb.length() - 1));
     }
-    
+
     @Override
     public Object lookup(String name) {
         HttpURLConnection con = manager.getConnection(urlFormString + "/jndi?name=" + name);
@@ -52,13 +57,11 @@ public class UrlContext implements Context {
                 }
                 in.close();
                 con.disconnect();
-                return lookup.toString();
+                return new Gson().fromJson(lookup.toString(), Object.class);
             } catch (ProtocolException e) {
                 log.error("{}", e.getMessage());
-                e.printStackTrace();
             } catch (IOException e) {
                 log.error("Unable to send data to the server, {}", e.getMessage());
-                e.printStackTrace();
             }
         }
         return null;
@@ -71,19 +74,21 @@ public class UrlContext implements Context {
         stringIterator.forEachRemaining(str -> sb.append(str).append('.'));
         bind(sb.toString(), obj);
     }
-    
+
     @Override
     public void bind(String name, Object obj) {
         HttpURLConnection con = manager.getConnection(urlFormString + "/jndi");
         if (con != null) {
             try {
                 con.setRequestMethod("POST");
+                Gson gson = new Gson();
                 Map<String, Object> parameters = new HashMap<>();
-                parameters.put("key", name);
-                parameters.put("value", obj);
+                parameters.put(name, obj);
+                String s = gson.toJson(parameters, HashMap.class);
+                log.error("Converted JSON - {}", s);
                 con.setDoOutput(true);
                 DataOutputStream out = new DataOutputStream(con.getOutputStream());
-                out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+                out.writeBytes(s);
                 out.flush();
                 out.close();
                 BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));

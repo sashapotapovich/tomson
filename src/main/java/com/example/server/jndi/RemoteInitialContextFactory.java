@@ -1,13 +1,11 @@
-package com.example.tomson.jndi;
+package com.example.server.jndi;
 
-import com.example.tomson.util.FastHashtable;
+import com.example.server.util.FastHashtable;
 import java.util.Hashtable;
 import java.util.Map;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
-
-;
 
 public class RemoteInitialContextFactory implements InitialContextFactory {
     

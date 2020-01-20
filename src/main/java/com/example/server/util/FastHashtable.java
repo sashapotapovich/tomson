@@ -1,4 +1,4 @@
-package com.example.tomson.util;
+package com.example.server.util;
 
 import java.util.Collection;
 import java.util.Enumeration;

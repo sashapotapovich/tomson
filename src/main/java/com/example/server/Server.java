@@ -1,9 +1,11 @@
-package com.example.tomson;
+package com.example.server;
 
-import com.example.tomson.jndi.JndiProperties;
+import com.example.server.jndi.JndiProperties;
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.test.di.annotations.Autowired;
@@ -61,32 +63,42 @@ public class Server {
         return port.orElse(8080);
     }
 
+    @SuppressWarnings("unchecked")
     private void handleTestRequest(HttpExchange exchange) throws IOException {
         log.info(exchange.getProtocol());
-        exchange.getHttpContext().getAttributes()
-                .forEach((key, value) -> log.info("Http Attributes: key - " + key +
-                        ", value - " + value));
         log.info(exchange.getHttpContext().getPath());
         log.info(exchange.getRequestMethod());
-        BufferedReader body = new BufferedReader(new InputStreamReader(exchange.getRequestBody()));
-        while (body.ready()) {
-            String line = body.readLine();
-            log.info(line);
-        }
         String query = exchange.getRequestURI().getQuery();
         log.error("Query - {}", query);
         log.error("URI - {}", exchange.getRequestURI().toASCIIString());
-        exchange.getRequestHeaders()
-                .forEach((key, value) -> log.info("Headers: key - " + key + "values - "
-                        + value.stream()
-                        .reduce(" - ", String::concat)));
-        exchange.sendResponseHeaders(200, "value".getBytes().length);
+        Object jndiProperty = new Object();
+        if (exchange.getRequestMethod().equals("POST")){
+            StringBuilder sb = new StringBuilder();
+            BufferedReader body = new BufferedReader(new InputStreamReader(exchange.getRequestBody()));
+            while (body.ready()) {
+                sb.append(body.readLine());
+                log.info(sb.toString());
+            }
+            Gson gson = new Gson();
+            HashMap<String, Object> hashMap = gson.fromJson(sb.toString(), HashMap.class);
+            hashMap.forEach((key, value) -> log.error(key + " = " + value));
+            hashMap.forEach((key, value) -> jndiProperties.setJndiProperty(key, value));
+            body.close();
+        } else if (exchange.getRequestMethod().equals("GET")){
+            String query2 = exchange.getRequestURI().getQuery();
+            jndiProperty = jndiProperties.getJndiProperty(query2.replace("name=", ""));
+            log.error("JndiProperty - {}", jndiProperty);
+        }
+        Gson gson = new Gson();
+        log.error("Class - {}", jndiProperty.getClass());
+        String responseBodyJson = gson.toJson(jndiProperty);
+        log.error("Response Body - {}", responseBodyJson);
+        exchange.sendResponseHeaders(200, responseBodyJson.getBytes().length);
         OutputStream responseBody = exchange.getResponseBody();
         exchange.setStreams(null, responseBody);
-        responseBody.write("value".getBytes());
+        responseBody.write(responseBodyJson.getBytes());
         responseBody.flush();
         responseBody.close();
-        body.close();
     }
 
 }

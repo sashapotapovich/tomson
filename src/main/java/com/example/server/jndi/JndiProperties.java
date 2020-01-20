@@ -1,4 +1,4 @@
-package com.example.tomson.jndi;
+package com.example.server.jndi;
 
 import java.util.HashMap;
 import org.test.di.annotations.Component;
