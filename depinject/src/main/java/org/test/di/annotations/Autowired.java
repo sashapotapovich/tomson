@@ -1,4 +1,4 @@
-package com.example.server.annotations;
+package org.test.di.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,6 +7,5 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface Resource {
-    public String name() default "";
+public @interface Autowired {
 }

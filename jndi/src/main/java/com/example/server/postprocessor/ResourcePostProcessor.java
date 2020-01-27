@@ -35,7 +35,7 @@ public class ResourcePostProcessor implements BeanPostProcessor {
                     log.error(e.getMessage());
                     throw new RuntimeException("Unable to set value for - " + s);
                 } catch (NamingException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage());
                 }
             }
         }

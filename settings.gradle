@@ -1,3 +1,5 @@
-rootProject.name = 'server'
+rootProject.name = 'tomson'
 include 'client'
+include 'jndi'
+include 'depinject'
 
