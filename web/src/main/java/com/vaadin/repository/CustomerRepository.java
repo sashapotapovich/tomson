@@ -2,13 +2,33 @@ package com.vaadin.repository;
 
 import com.vaadin.entity.Customer;
 import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
+import org.test.di.annotations.Component;
 
-public interface CustomerRepository extends JpaRepository<Customer, Long> {
+@Component
+public class CustomerRepository{
+
+    public List<Customer> findAllByFirstNameContains(String firstName) {
+        return null;
+    }
     
-    List<Customer> findAllByFirstNameContainsOrFirstNameContains(String firstName, String firstName2);
-    
-    List<Customer> findAllByFirstNameContains(String firstName);
-    
-    
+    public Optional<Customer> findById(long longValue) {
+        return null;
+    }
+
+    public List<Customer> findAll() {
+        return null;
+    }
+
+    public void delete(Customer customer) {
+        
+    }
+
+    public boolean save(Customer customer) {
+        return true;
+    }
+
+    public boolean saveAll(List<Customer> customers) {
+        return false;
+    }
 }

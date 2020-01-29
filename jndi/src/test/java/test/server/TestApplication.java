@@ -3,7 +3,7 @@ package test.server;
 import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import lombok.SneakyThrows;
+import javax.naming.NamingException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,9 +17,8 @@ public class TestApplication {
         ApplicationContext applicationContext = new ApplicationContext("com.example.server");
     }
     
-    @SneakyThrows
     @Test
-    public void test(){
+    public void test() throws NamingException {
         Properties env = new Properties();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.example.server.jndi.RemoteInitialContextFactory");
         env.put(Context.PROVIDER_URL, "http://localhost:8080");

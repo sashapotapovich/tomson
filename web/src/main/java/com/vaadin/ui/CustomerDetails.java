@@ -8,16 +8,12 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.repository.CustomerRepository;
 import java.util.Optional;
-import javax.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
+import org.test.di.annotations.Component;
+import org.test.di.annotations.PostConstruct;
 
-@Slf4j
-@UIScope
-@SpringComponent
+@Component
 @Route(value = "details", layout = MenuView.class)
 public class CustomerDetails extends VerticalLayout implements RouterLayout {
     public static final String ID = "details";

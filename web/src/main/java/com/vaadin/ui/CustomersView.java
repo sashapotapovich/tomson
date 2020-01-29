@@ -8,20 +8,14 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.repository.CustomerRepository;
 import com.vaadin.ui.editor.CustomerEditor;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.annotation.Secured;
+import org.test.di.annotations.PostConstruct;
 
 @Slf4j
-@UIScope
-@SpringComponent
 @Route(value = "customers", layout = MenuView.class)
-@Secured("ROLE_ADMIN")
 public class CustomersView extends VerticalLayout implements RouterLayout {
     public static final String ID = "customers";
     private static TextField groupFilter = new TextField("Name Filter", "");

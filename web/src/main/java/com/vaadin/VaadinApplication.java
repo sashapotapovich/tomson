@@ -1,20 +1,12 @@
 package com.vaadin;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.test.di.app.ApplicationContext;
 
-@SpringBootApplication
-public class VaadinApplication extends SpringBootServletInitializer {
+public class VaadinApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(VaadinApplication.class, args);
+        ApplicationContext applicationContext = new ApplicationContext("com.vaadin");
     }
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(VaadinApplication.class);
-    }
-    
+
 }
