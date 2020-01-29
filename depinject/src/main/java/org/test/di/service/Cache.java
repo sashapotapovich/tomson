@@ -1,15 +1,17 @@
 package org.test.di.service;
 
-import java.util.HashMap;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.test.di.utils.Pair;
+
+import java.util.HashMap;
+import java.util.Set;
 
 public class Cache {
     private static final Logger log = LoggerFactory.getLogger(Cache.class);
-    
+
     private static Cache instance = null;
-    private final HashMap<String, Object> beans = new HashMap<>();
+    private final HashMap<String, Pair<Class<?>, Object>> beans = new HashMap<>();
 
     private Cache() {
     }
@@ -23,18 +25,19 @@ public class Cache {
 
     public Object getBean(String beanName) {
         log.info("Trying to get Bean from Cache - {}", beanName);
-        return beans.get(beanName);
+        Class<?> cast = beans.get(beanName).getLeft();
+        return cast.cast(beans.get(beanName).getRight());
     }
-    
+
     public Set<String> getAllBeanNames() {
         return beans.keySet();
     }
 
-    public void addBean(String beanName, Object bean) {
+    public void addBean(String beanName, Pair<Class<?>, Object> bean) {
         log.info("Adding new Bean to Cache - {}", beanName);
         beans.put(beanName, bean);
     }
-    
+
     public void clear() {
         beans.clear();
     }

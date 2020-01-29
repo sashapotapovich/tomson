@@ -1,9 +1,9 @@
 package com.vaadin.datasource;
 
-import javax.persistence.EntityManager;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.jpa.HibernatePersistenceProvider;
+
+import javax.persistence.EntityManager;
 
 @Getter
 @Setter
@@ -18,7 +18,6 @@ public class DbConfig {
     private boolean showSQL;
 
     public EntityManager entityManager() {
-        HibernatePersistenceProvider hibernatePersistenceProvider = new HibernatePersistenceProvider();
         return null;
     }
 

@@ -58,10 +58,11 @@ public class BeanFactory {
                 if (value.equals(Scope.PROXY)) {
                     proxyList.add(beanName);
                 }
-                Cache.getInstance().addBean(beanName, instance);
+                Cache.getInstance().addBean(beanName, new Pair<Class<?>, Object>(classObject, instance));
                 for (Field field : classObject.getDeclaredFields()) {
                     if (field.isAnnotationPresent(Autowired.class)) {
-                        String fieldName = field.getName();
+                        String classNameForAuto = field.getType().getSimpleName();
+                        String fieldName = classNameForAuto.substring(0, 1).toLowerCase() + classNameForAuto.substring(1);
                         autowireCandidates.put(fieldName, new Pair<>(field, instance));
                     }
                 }

@@ -3,4 +3,6 @@ include 'client'
 include 'jndi'
 include 'depinject'
 include 'web'
+include 'common-module'
+include 'server'
 

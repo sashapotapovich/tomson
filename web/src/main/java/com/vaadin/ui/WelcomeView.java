@@ -1,6 +1,5 @@
 package com.vaadin.ui;
 
-import com.vaadin.entity.CurrentUser;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -14,12 +13,10 @@ public class WelcomeView extends VerticalLayout implements RouterLayout {
 
     public static final String ID = "welcome";
 
-    private CurrentUser currentUser;
     private VerticalLayout verticalLayout;
     private H2 h2;
 
-    public WelcomeView(CurrentUser currentUser) {
-        this.currentUser = currentUser;
+    public WelcomeView(){
     }
 
     @PostConstruct

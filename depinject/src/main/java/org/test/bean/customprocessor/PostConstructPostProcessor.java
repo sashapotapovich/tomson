@@ -27,7 +27,7 @@ public class PostConstructPostProcessor implements BeanPostProcessor {
                     method.invoke(bean);
                     method.setAccessible(false);
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    log.error(e.getMessage());
+                    log.error(e.toString());
                     throw new RuntimeException("Unable to initialize Bean - " + beanName);
                 }
             }
