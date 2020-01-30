@@ -7,10 +7,6 @@ import com.server.command.AddCustomerCommandImpl;
 import com.server.server.servlet.HelloServlet;
 import com.server.server.servlet.wrapper.HttpHandlerWithServletSupport;
 import com.sun.net.httpserver.HttpServer;
-import org.test.di.annotations.Autowired;
-import org.test.di.annotations.Component;
-import org.test.di.annotations.PostConstruct;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.rmi.AlreadyBoundException;
@@ -20,20 +16,20 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
+import org.test.di.annotations.Autowired;
+import org.test.di.annotations.Component;
 
 @Component
 public class Initialize {
 
     @Autowired
     private HelloServlet helloServlet;
-
-    @PostConstruct
+    
     public void run() throws AlreadyBoundException, IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
 
         server.createContext("/test", new HttpHandlerWithServletSupport(helloServlet));
-
-
+        
         server.setExecutor(null);
         server.start();
 
@@ -46,5 +42,6 @@ public class Initialize {
 
         Remote remoteServerCommandManager = UnicastRemoteObject.exportObject(scm, 2005);
         registry.bind(ServerCommandManager.class.getSimpleName(), remoteServerCommandManager);
+        System.out.println("Post Construct");
     }
 }

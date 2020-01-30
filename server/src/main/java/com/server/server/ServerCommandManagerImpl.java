@@ -35,7 +35,7 @@ public class ServerCommandManagerImpl implements ServerCommandManager {
 		switch (implClass.getAnnotation(WebServlet.class).value()) {
 			case "A":
 				return (D) command.execute(obj);
-			case "": //TODO: Implement
+			case "/test": //TODO: Implement
 			default:
 				try {
 					return EXECUTOR_SERVICE.submit(new Worker<D>(implClass.newInstance(), obj)).get();
