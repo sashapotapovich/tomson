@@ -4,13 +4,19 @@ package com.server.server;
 import com.common.command.Command;
 import com.common.command.ServerCommandManager;
 import com.common.model.TransferObject;
+import com.server.annotation.CrearecBeanState;
 import com.server.executor.RejectedExecutionHandlerImpl;
-import lombok.Setter;
-import org.test.di.annotations.WebServlet;
-
 import java.rmi.RemoteException;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import lombok.Setter;
 
 public class ServerCommandManagerImpl implements ServerCommandManager {
 
@@ -32,10 +38,10 @@ public class ServerCommandManagerImpl implements ServerCommandManager {
 	public <T extends Command, D extends TransferObject> D execute(final Class<T> clazz, D obj) throws RemoteException, ExecutionException, InterruptedException {
 		Command command = commands.get(clazz);
 		Class<? extends Command> implClass = command.getClass();
-		switch (implClass.getAnnotation(WebServlet.class).value()) {
-			case "A":
-				return (D) command.execute(obj);
-			case "/test": //TODO: Implement
+        switch (implClass.getAnnotation(CrearecBeanState.class).value()) {
+            case STATEFUL:
+                return (D) command.execute(obj);
+            case STATELESS:
 			default:
 				try {
 					return EXECUTOR_SERVICE.submit(new Worker<D>(implClass.newInstance(), obj)).get();

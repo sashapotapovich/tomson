@@ -7,11 +7,9 @@ import com.server.dao.helper.JdbcDaoSupport;
 import com.server.dao.helper.RowMapper;
 import com.server.dao.helper.RowMapperImpl;
 import com.server.dao.helper.SqlBuilder;
-import java.util.ArrayList;
+import java.util.List;
 import org.test.di.annotations.Autowired;
 import org.test.di.annotations.Component;
-
-import java.util.List;
 
 @Component
 public class CustomerJdbcDao extends JdbcDaoSupport implements CustomerDao {
@@ -22,13 +20,13 @@ public class CustomerJdbcDao extends JdbcDaoSupport implements CustomerDao {
 
 	@Override
 	public List<Customer> findAll() {
-        ArrayList<Customer> customers = new ArrayList<>();
+/*        ArrayList<Customer> customers = new ArrayList<>();
         customers.add(new Customer("123", "ASD", "a"));
         customers.add(new Customer("234", "QWE", "q"));
         customers.add(new Customer("345", "ZXC", "s"));
         customers.add(new Customer("456", "asd", "c"));
-        return customers;
-		//return selectList(builder.getSelectSQL(Customer.class), rowMap, null);
+        return customers;*/
+		return selectList(builder.getSelectSQL(Customer.class), rowMap, null);
 	}
 
 	@Override

@@ -2,19 +2,19 @@ package com.server.server.servlet;
 
 
 import com.common.model.Customer;
+import com.server.annotation.CrearecWebServlet;
 import com.server.dao.CustomerDao;
 import com.server.dao.jdbc.CustomerJdbcDao;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.test.di.annotations.Component;
 
-@WebServlet("/test")
+@CrearecWebServlet("/test")
 @Component
 public class HelloServlet extends HttpServlet {
 	private static final long serialVersionUID = -835091317331676452L;
