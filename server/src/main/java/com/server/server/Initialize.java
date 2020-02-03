@@ -25,6 +25,7 @@ public class Initialize {
     @Autowired
     private HelloServlet helloServlet;
     
+    //TODO: Add Vaadin support
     public void run() throws AlreadyBoundException, IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(8090), 0);
 
