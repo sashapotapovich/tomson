@@ -26,7 +26,7 @@ public class Initialize {
     private HelloServlet helloServlet;
     
     public void run() throws AlreadyBoundException, IOException {
-        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress(8090), 0);
 
         server.createContext("/test", new HttpHandlerWithServletSupport(helloServlet));
         

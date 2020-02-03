@@ -15,7 +15,12 @@ public class PostConstructPostProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessBeforeInitialization(String beanName, Object bean) {
-        log.info("Post Construct Method Before");
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(String beanName, Object bean) {
+        log.info("Post Construct Method After");
         for (Method method : bean.getClass().getDeclaredMethods()) {
             if (method.isAnnotationPresent(PostConstruct.class)) {
                 if (method.getParameterTypes().length != 0) {
@@ -32,11 +37,6 @@ public class PostConstructPostProcessor implements BeanPostProcessor {
                 }
             }
         }
-        return bean;
-    }
-
-    @Override
-    public Object postProcessAfterInitialization(String beanName, Object bean) {
         return bean;
     }
 }

@@ -17,7 +17,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ServerCommandManagerImpl implements ServerCommandManager {
 
 	private static final long serialVersionUID = -379232848482999023L;
@@ -36,16 +38,19 @@ public class ServerCommandManagerImpl implements ServerCommandManager {
 
 	@Override
 	public <T extends Command, D extends TransferObject> D execute(final Class<T> clazz, D obj) throws RemoteException, ExecutionException, InterruptedException {
+	    log.info("Received new Command - {}", clazz.getName());
 		Command command = commands.get(clazz);
 		Class<? extends Command> implClass = command.getClass();
+		log.info("blah-blah - {}", implClass.getName());
         switch (implClass.getAnnotation(CrearecBeanState.class).value()) {
-            case STATEFUL:
-                return (D) command.execute(obj);
             case STATELESS:
+                return (D) command.execute(obj);
+            case STATEFUL:
 			default:
 				try {
 					return EXECUTOR_SERVICE.submit(new Worker<D>(implClass.newInstance(), obj)).get();
 				} catch (InstantiationException | IllegalAccessException e) {
+				    log.error("execute exception - {}", e.getMessage());
 					throw new RuntimeException(e);
 				}
 		}

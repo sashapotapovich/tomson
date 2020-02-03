@@ -8,15 +8,14 @@ import com.server.dao.helper.RowMapper;
 import com.server.dao.helper.RowMapperImpl;
 import com.server.dao.helper.SqlBuilder;
 import java.util.List;
-import org.test.di.annotations.Autowired;
 import org.test.di.annotations.Component;
 
 @Component
 public class CustomerJdbcDao extends JdbcDaoSupport implements CustomerDao {
 
 	private RowMapper<Customer> rowMap = new RowMapperImpl<>(new Customer());
-	@Autowired
-	private SqlBuilder builder;
+	//@Autowired
+	private SqlBuilder builder = new SqlBuilder();
 
 	@Override
 	public List<Customer> findAll() {
