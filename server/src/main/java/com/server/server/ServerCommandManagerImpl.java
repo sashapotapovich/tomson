@@ -35,8 +35,7 @@ public class ServerCommandManagerImpl implements ServerCommandManager {
 		EXECUTOR_SERVICE = new ThreadPoolExecutor(2, 4, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<>(2), threadFactory, rejectionHandler);
 
 	}
-
-	//TODO: Update here
+	
 	@Override
 	public <T extends Command, D extends TransferObject> D execute(final Class<T> clazz, D obj) throws RemoteException, ExecutionException, InterruptedException {
 	    log.info("Received new Command - {}", clazz.getName());

@@ -12,5 +12,4 @@ dependencies {
     compile project(':client')
     compile project(':jndi')
     compile project(':depinject')
-    compile project(':web')
 }

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet id="2019-01-03-default-values-001-customer" author="CreaRec" runOnChange="true">
+		<preConditions onFail="MARK_RAN">
+			<tableIsEmpty schemaName="public" tableName="customer"/>
+		</preConditions>
+
+		<insert tableName="customer">
+			<column name="ssn" value="ssn1"/>
+			<column name="cust_name" value="test1"/>
+			<column name="address" value="address1"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn2"/>
+			<column name="cust_name" value="test2"/>
+			<column name="address" value="address2"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn3"/>
+			<column name="cust_name" value="test3"/>
+			<column name="address" value="address3"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn4"/>
+			<column name="cust_name" value="test4"/>
+			<column name="address" value="address4"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn5"/>
+			<column name="cust_name" value="test5"/>
+			<column name="address" value="address5"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn6"/>
+			<column name="cust_name" value="test6"/>
+			<column name="address" value="address6"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn7"/>
+			<column name="cust_name" value="test7"/>
+			<column name="address" value="address7"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn8"/>
+			<column name="cust_name" value="test8"/>
+			<column name="address" value="address8"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn9"/>
+			<column name="cust_name" value="test9"/>
+			<column name="address" value="address9"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn10"/>
+			<column name="cust_name" value="test10"/>
+			<column name="address" value="address10"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn11"/>
+			<column name="cust_name" value="test11"/>
+			<column name="address" value="address11"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn12"/>
+			<column name="cust_name" value="test12"/>
+			<column name="address" value="address12"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn13"/>
+			<column name="cust_name" value="test13"/>
+			<column name="address" value="address13"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn14"/>
+			<column name="cust_name" value="test14"/>
+			<column name="address" value="address14"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn15"/>
+			<column name="cust_name" value="test15"/>
+			<column name="address" value="address15"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn16"/>
+			<column name="cust_name" value="test16"/>
+			<column name="address" value="address16"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn17"/>
+			<column name="cust_name" value="test17"/>
+			<column name="address" value="address17"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn18"/>
+			<column name="cust_name" value="test18"/>
+			<column name="address" value="address18"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn19"/>
+			<column name="cust_name" value="test19"/>
+			<column name="address" value="address19"/>
+		</insert>
+		<insert tableName="customer">
+			<column name="ssn" value="ssn20"/>
+			<column name="cust_name" value="test20"/>
+			<column name="address" value="address20"/>
+		</insert>
+	</changeSet>
+</databaseChangeLog>

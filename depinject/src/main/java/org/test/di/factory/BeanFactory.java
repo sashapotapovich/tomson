@@ -80,7 +80,7 @@ public class BeanFactory {
         } catch (URISyntaxException e) {
             log.error(e.toString());
         }
-        String actualFile = jarFile.getParentFile().getAbsolutePath() + File.separator + "testForDIFrmwrk-1.0-SNAPSHOT-all.jar";
+        String actualFile = jarFile.getAbsolutePath();
         log.info("jarFile is : {}", jarFile.getAbsolutePath());
         log.info("actulaFilePath is : {}", actualFile);
         try (JarFile jar = new JarFile(actualFile)) {
