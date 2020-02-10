@@ -25,6 +25,7 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import lombok.extern.slf4j.Slf4j;
+import org.postgresql.Driver;
 import org.test.di.app.ApplicationContext;
 
 import static ch.qos.logback.core.db.DBHelper.closeConnection;
@@ -32,9 +33,11 @@ import static ch.qos.logback.core.db.DBHelper.closeConnection;
 @Slf4j
 public class Main {
 
-	public static void main(String[] args) throws AlreadyBoundException, IOException {
+	public static void main(String[] args) throws AlreadyBoundException, IOException, ClassNotFoundException, SQLException {
 		log.info("Starting...");
-		System.setProperty("java.rmi.server.codebase", "http://10.0.75.1:2005");
+        Class.forName("org.postgresql.Driver");
+        DriverManager.registerDriver(new Driver());
+		System.setProperty("java.rmi.server.codebase", "http://127.0.0.1:2005");
         log.info(System.getProperty("java.security.policy"));
         liquibaseUpdateWithChangelog();
         ApplicationContext applicationContext = new ApplicationContext("com.server");
@@ -44,7 +47,7 @@ public class Main {
         Map<Class, Command> commands = new HashMap<>();
         commands.put(AddCustomerCommand.class, new AddCustomerCommandImpl());
         scm.setCommands(commands);
-        System.setProperty("java.rmi.server.hostname","10.0.75.1");
+        System.setProperty("java.rmi.server.hostname","127.0.0.1");
         Remote remoteServerCommandManager = UnicastRemoteObject.exportObject(scm, 2005);
         registry.rebind(ServerCommandManager.class.getSimpleName(), remoteServerCommandManager);
         int ssn = ThreadLocalRandom.current().nextInt();

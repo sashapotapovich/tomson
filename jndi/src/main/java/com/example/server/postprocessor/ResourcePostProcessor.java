@@ -14,7 +14,7 @@ import org.test.di.config.BeanPostProcessor;
 @Component
 public class ResourcePostProcessor implements BeanPostProcessor {
     private final Logger log = LoggerFactory.getLogger(ResourcePostProcessor.class);
-
+    
     @Override
     public Object postProcessBeforeInitialization(String s, Object o) {
         log.info("Post Construct Method Before");
@@ -45,5 +45,10 @@ public class ResourcePostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessAfterInitialization(String s, Object o) {
         return null;
+    }
+
+    @Override
+    public Integer getPriority() {
+        return 99;
     }
 }

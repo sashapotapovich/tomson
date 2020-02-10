@@ -39,4 +39,9 @@ public class PostConstructPostProcessor implements BeanPostProcessor {
         }
         return bean;
     }
+
+    @Override
+    public Integer getPriority() {
+        return 1;
+    }
 }

@@ -21,4 +21,9 @@ public class CustomPostProcessor implements BeanPostProcessor {
         log.info("Running CustomPostProcessor After Init for Bean - {}", beanName);
         return bean;
     }
+
+    @Override
+    public Integer getPriority() {
+        return 0;
+    }
 }

@@ -8,10 +8,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -30,8 +32,9 @@ import org.test.di.utils.Pair;
 public class BeanFactory {
     private static final Logger log = LoggerFactory.getLogger(BeanFactory.class);
 
-    private Map<String, Pair<Field, Object>> autowireCandidates = new HashMap<>();
-    private List<BeanPostProcessor> postProcessors = new ArrayList<>();
+    private Map<String, List<Pair<Field, Object>>> autowireCandidates = new HashMap<>();
+    private PriorityQueue<BeanPostProcessor> postProcessors = new PriorityQueue<>(Comparator.comparing(BeanPostProcessor::getPriority));
+    //private List<BeanPostProcessor> postProcessors = new ArrayList<>();
     private List<String> proxyList = new ArrayList<>();
     private ProxyBeanGenerationStrategy proxyStrategy = new ProxyBeanGenerationStrategy();
     private SingletonBeanGenerationStrategy singletonStrategy = new SingletonBeanGenerationStrategy();
@@ -49,7 +52,7 @@ public class BeanFactory {
                 if (instance instanceof BeanPostProcessor) {
                     BeanPostProcessor postProcessor = (BeanPostProcessor) instance;
                     addPostProcessor(postProcessor);
-                    return;
+                    //return;
                 }
                 Component component = classObject.getAnnotation(Component.class);
                 Scope value = component.value();
@@ -63,11 +66,12 @@ public class BeanFactory {
                     if (field.isAnnotationPresent(Autowired.class)) {
                         String classNameForAuto = field.getType().getSimpleName();
                         String fieldName = classNameForAuto.substring(0, 1).toLowerCase() + classNameForAuto.substring(1);
-                        autowireCandidates.put(fieldName, new Pair<>(field, instance));
+                        autowireCandidates.computeIfAbsent(fieldName, (k) -> new ArrayList<>())
+                                          .add(new Pair<>(field, instance));
                     }
                 }
             }
-        } catch (IllegalAccessException | InstantiationException 
+        } catch (IllegalAccessException | InstantiationException
                 | NoSuchMethodException | InvocationTargetException e) {
             log.error(e.toString());
         }
@@ -112,7 +116,7 @@ public class BeanFactory {
             while (resourceUrls.hasMoreElements()) {
                 URL url = resourceUrls.nextElement();
                 URI uri = url.toURI();
-                if (uri.isOpaque()){
+                if (uri.isOpaque()) {
                     log.info("We are in the JAR file, so will work with file system as with jar");
                     forJar(path);
                     return;
@@ -140,24 +144,26 @@ public class BeanFactory {
     }
 
     public void populateProperties() {
-        try {
-            autowireCandidates.keySet().forEach(value -> log.info("Autowire Candidates held in list - {}", value));
-            for (String beanName : autowireCandidates.keySet()) {
-                Pair<Field, Object> pair = autowireCandidates.get(beanName);
-                Field field = pair.getLeft();
-                log.info("Autowiring Field - {}", field.toGenericString());
-                field.setAccessible(true);
-                if (proxyList.contains(beanName)) {
-                    Object bean = ServiceLocator.getBean(beanName, proxyStrategy);
-                    field.set(pair.getRight(), bean);
-                } else {
-                    Object bean = ServiceLocator.getBean(beanName, singletonStrategy);
-                    field.set(pair.getRight(), bean);
+        autowireCandidates.keySet().forEach(value -> log.info("Autowire Candidates held in list - {}", value));
+        for (String beanName : autowireCandidates.keySet()) {
+            List<Pair<Field, Object>> pairs = autowireCandidates.get(beanName);
+            try {
+                for (Pair<Field, Object> pair : pairs) {
+                    Field field = pair.getLeft();
+                    log.info("Autowiring Field - {}", field.toGenericString());
+                    field.setAccessible(true);
+                    if (proxyList.contains(beanName)) {
+                        Object bean = ServiceLocator.getBean(beanName, proxyStrategy);
+                        field.set(pair.getRight(), bean);
+                    } else {
+                        Object bean = ServiceLocator.getBean(beanName, singletonStrategy);
+                        field.set(pair.getRight(), bean);
+                    }
+                    field.setAccessible(false);
                 }
-                field.setAccessible(false);
+            } catch (IllegalAccessException e) {
+                log.error(e.toString());
             }
-        } catch (IllegalAccessException e) {
-            log.error(e.toString());
         }
     }
 
