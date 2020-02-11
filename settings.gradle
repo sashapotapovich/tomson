@@ -1,5 +1,4 @@
 rootProject.name = 'tomson'
-include 'client'
 include 'jndi'
 include 'depinject'
 include 'common-module'
