@@ -80,6 +80,6 @@ public class Main {
     public static Connection getConnection() throws SQLException, ClassNotFoundException {
         Class.forName("org.postgresql.Driver");
         log.info("Trying to get connection");
-        return DriverManager.getConnection("jdbc:postgresql://postgres:5432/postgres", "postgres", "postgres");
+        return DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "postgres");
     }
 }

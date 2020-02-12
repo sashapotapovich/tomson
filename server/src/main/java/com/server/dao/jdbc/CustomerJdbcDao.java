@@ -23,8 +23,8 @@ public class CustomerJdbcDao extends JdbcDaoSupport implements CustomerDao {
 
     @Override
     public Customer findBySsn(String ssn) {
-	    String SQL = "Select * from public.customer where ssn = " + ssn;
-        return read(getId(SQL));
+	    String SQL = "Select * from public.customer where customer.ssn = '" + ssn + "'";
+        return selectOne(SQL, rowMap, 1L);
     }
 
     @Override

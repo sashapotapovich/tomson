@@ -17,13 +17,3 @@ services:
       POSTGRES_DB: postgres
     ports:
       - "5432:5432"
-  app:
-    build:
-      context: app
-      dockerfile: Dockerfile
-    container_name: app
-    depends_on:
-      - database
-      - ldap
-    ports:
-      - "2005:2005"

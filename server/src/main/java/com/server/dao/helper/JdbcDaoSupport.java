@@ -36,7 +36,7 @@ public class JdbcDaoSupport {
 
 		try (Connection con = getConnection(); PreparedStatement statement = con.prepareStatement(sql)) {
 
-			statement.setObject(1, param);
+			//statement.setObject(1, param);
 
 			try (ResultSet rs = statement.executeQuery()) {
 				if (rs.next()) {
