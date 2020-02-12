@@ -35,7 +35,7 @@ import static ch.qos.logback.core.db.DBHelper.closeConnection;
 @Slf4j
 public class Main {
 
-	public static void main(String[] args) throws AlreadyBoundException, IOException, ClassNotFoundException, SQLException {
+	public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException {
 		log.info("Starting...");
         Class.forName("org.postgresql.Driver");
         DriverManager.registerDriver(new Driver());

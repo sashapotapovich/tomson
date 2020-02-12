@@ -35,7 +35,7 @@ public class ConnectionPool {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //init(min, max, jdbcClassName, jdbcUrl, login, passwd);
+        init(min, max, jdbcClassName, jdbcUrl, login, passwd);
     }
 
     private void init(int min, int max, String jdbcClassName, String jdbcUrl, String login, String passwd) {

@@ -3,4 +3,5 @@ include 'jndi'
 include 'depinject'
 include 'common-module'
 include 'server'
+include 'mq'
 
