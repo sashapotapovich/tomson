@@ -2,7 +2,13 @@ package com.mq;
 
 import com.ibm.msg.client.jms.JmsConnectionFactory;
 import java.util.Properties;
+import javax.jms.Connection;
+import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.TextMessage;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -14,11 +20,20 @@ public class Main {
     public static void main(String[] args) throws NamingException, JMSException {
         ApplicationContext applicationContext = new ApplicationContext("com.mq");
         ConnectionFactory connectionFactory = (ConnectionFactory) applicationContext.getBeanFactory().getBean("connectionFactory");
-        Properties env = new Properties();
+       /* Properties env = new Properties();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.rmi.registry.RegistryContextFactory");
-        env.put(Context.PROVIDER_URL, "remote+http://localhost:2005");
-        Context localContext = new InitialContext(env);
+        env.put(Context.PROVIDER_URL, "rmi://localhost:2005");
+        Context localContext = new InitialContext(env);*/
         JmsConnectionFactory jmsConnectionFactory = connectionFactory.jmsConnectionFactory();
-        localContext.bind("java:/mq", jmsConnectionFactory);
+        Connection connection = jmsConnectionFactory.createConnection();
+        connection.start();
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Destination queue = session.createQueue("queue:///" + "%queueName%");
+        MessageProducer producer = session.createProducer(queue);
+        TextMessage message =  session.createTextMessage();
+        message.setText("text");
+        producer.send(message);
+        
+        //localContext.bind("java:/mq", jmsConnectionFactory);
     }
 }
