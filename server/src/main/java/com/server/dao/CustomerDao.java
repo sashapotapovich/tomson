@@ -7,4 +7,6 @@ import java.util.List;
 public interface CustomerDao extends CrudDao<Long, Customer> {
 
 	List<Customer> findAll();
+	Customer findBySsn(String ssn);
+	
 }

@@ -3,9 +3,11 @@ package com.server.server;
 
 import com.common.command.AddCustomerCommand;
 import com.common.command.Command;
+import com.common.command.DeleteCustomerCommand;
 import com.common.command.ServerCommandManager;
 import com.common.model.Customer;
 import com.server.command.AddCustomerCommandImpl;
+import com.server.command.DeleteCustomerCommandImpl;
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Remote;
@@ -46,6 +48,7 @@ public class Main {
 
         Map<Class, Command> commands = new HashMap<>();
         commands.put(AddCustomerCommand.class, new AddCustomerCommandImpl());
+        commands.put(DeleteCustomerCommand.class, new DeleteCustomerCommandImpl());
         scm.setCommands(commands);
         System.setProperty("java.rmi.server.hostname","127.0.0.1");
         Remote remoteServerCommandManager = UnicastRemoteObject.exportObject(scm, 2005);
