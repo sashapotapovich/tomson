@@ -6,11 +6,13 @@ import com.common.command.Command;
 import com.common.command.DeleteCustomerCommand;
 import com.common.command.ServerCommandManager;
 import com.common.model.Customer;
+import com.common.model.RemoteContextHolder;
+import com.mq.ConnectionFactory;
 import com.server.command.AddCustomerCommandImpl;
 import com.server.command.DeleteCustomerCommandImpl;
 import java.io.IOException;
-import java.rmi.AlreadyBoundException;
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -20,6 +22,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
@@ -35,31 +40,57 @@ import static ch.qos.logback.core.db.DBHelper.closeConnection;
 @Slf4j
 public class Main {
 
-	public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException {
-		log.info("Starting...");
+    private static final String JNDI = "java:comp/env/jdbc/mq";
+    private static ConnectionFactory connectionFactory;
+
+    private static void bind(Registry registry) throws NamingException, RemoteException {
+        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
+        System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
+
+        final Context context = new InitialContext();
+        try {
+            context.createSubcontext("java:");
+            context.createSubcontext("java:comp");
+            context.createSubcontext("java:comp/env");
+            context.createSubcontext("java:comp/env/jdbc");
+            context.bind(JNDI, connectionFactory);
+            Remote adapter = new RemoteContextHolder(context);
+            Remote remoteContext = UnicastRemoteObject.exportObject(adapter, 2005);
+            registry.rebind("context", remoteContext);
+        } finally {
+            context.close();
+        }
+    }
+    
+    public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException, NamingException {
+        log.info("Starting...");
         Class.forName("org.postgresql.Driver");
+        System.setProperty("com.sun.jndi.rmi.object.trustURLCodebase", "true");
+        System.setProperty("com.sun.jndi.cosnaming.object.trustURLCodebase", "true");
+        /*System.setProperty("sun.rmi.registry.registryFilter", "java.**;com.common.**");*/
         DriverManager.registerDriver(new Driver());
-		System.setProperty("java.rmi.server.codebase", "http://127.0.0.1:2005");
+        System.setProperty("java.rmi.server.codebase", "http://localhost:2005");
         log.info(System.getProperty("java.security.policy"));
         liquibaseUpdateWithChangelog();
         ApplicationContext applicationContext = new ApplicationContext("com.server");
+        connectionFactory = (ConnectionFactory) applicationContext.getBeanFactory().getBean("connectionFactory");
         Registry registry = LocateRegistry.createRegistry(2005);
+        bind(registry);
         ServerCommandManagerImpl scm = new ServerCommandManagerImpl();
 
         Map<Class, Command> commands = new HashMap<>();
         commands.put(AddCustomerCommand.class, new AddCustomerCommandImpl());
         commands.put(DeleteCustomerCommand.class, new DeleteCustomerCommandImpl());
         scm.setCommands(commands);
-        System.setProperty("java.rmi.server.hostname","127.0.0.1");
         Remote remoteServerCommandManager = UnicastRemoteObject.exportObject(scm, 2005);
         registry.rebind(ServerCommandManager.class.getSimpleName(), remoteServerCommandManager);
         int ssn = ThreadLocalRandom.current().nextInt();
         AddCustomerCommandImpl addCustomerCommand = new AddCustomerCommandImpl();
         addCustomerCommand.execute(new Customer(String.valueOf(ssn), "ASD", "ZXC"));
         log.info("Running...");
-	}
-	
-	public static void liquibaseUpdateWithChangelog() {
+    }
+
+    public static void liquibaseUpdateWithChangelog() {
         Connection connection = null;
         try {
             connection = getConnection();

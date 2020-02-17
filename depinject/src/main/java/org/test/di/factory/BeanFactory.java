@@ -34,7 +34,6 @@ public class BeanFactory {
 
     private Map<String, List<Pair<Field, Object>>> autowireCandidates = new HashMap<>();
     private PriorityQueue<BeanPostProcessor> postProcessors = new PriorityQueue<>(Comparator.comparing(BeanPostProcessor::getPriority));
-    //private List<BeanPostProcessor> postProcessors = new ArrayList<>();
     private List<String> proxyList = new ArrayList<>();
     private ProxyBeanGenerationStrategy proxyStrategy = new ProxyBeanGenerationStrategy();
     private SingletonBeanGenerationStrategy singletonStrategy = new SingletonBeanGenerationStrategy();
@@ -109,6 +108,16 @@ public class BeanFactory {
 
     public void instantiate(String basePackage) {
         try {
+            ClassLoader classLoader2 = ClassLoader.getSystemClassLoader();
+            Package[] definedPackages = classLoader2.getDefinedPackages();
+            for (Package definedPackage : definedPackages) {
+                log.error(definedPackage.getName());
+            }
+            ClassLoader classLoader3 = BeanFactory.class.getClassLoader();
+            Package[] definedPackages2 = classLoader3.getDefinedPackages();
+            for (Package definedPackage : definedPackages2) {
+                log.error(definedPackage.getName());
+            }
             ClassLoader classLoader = ClassUtil.getClassLoader();
             String path = basePackage.replace('.', '/');
             log.info("Path created - {}", path);

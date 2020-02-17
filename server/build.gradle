@@ -67,9 +67,12 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     implementation('javax.servlet:javax.servlet-api:3.0.1')
-    compile project(':common-module')
+    implementation project(':common-module')
+    compile project(':mq')
     compile project(':depinject')
     //compile fileTree(include: ['*.jar'], dir: 'libs/')
+    compile group: 'javax.jms', name: 'javax.jms-api', version: '2.0.1'
+    compile group: 'com.ibm.mq', name: 'com.ibm.mq.allclient', version: '9.1.4.0'
     compile group: 'org.osgi', name: 'org.osgi.framework', version: '1.9.0'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     //compile group: 'com.h2database', name: 'h2', version: '1.4.200'
