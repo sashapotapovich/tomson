@@ -1,6 +1,7 @@
 package com.mq;
 
 import com.common.model.RemoteContextHolder;
+import com.common.model.RemoteContextHolderImpl;
 import com.ibm.msg.client.jms.JmsConnectionFactory;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -19,32 +20,9 @@ import javax.naming.NamingException;
 import org.test.di.app.ApplicationContext;
 
 public class Main {
+    
 
-    private static final String JNDI = "java:comp/env/jdbc/mq";
-
-    private static void lookup(Context context) throws NamingException {
-        try {
-            final ConnectionFactory jmsConnectionFactory = (ConnectionFactory) context.lookup(JNDI);
-            JmsConnectionFactory jmsConnectionFactory1 = jmsConnectionFactory.jmsConnectionFactory();
-            Connection connection = jmsConnectionFactory1.createConnection();
-            connection.start();
-            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Destination queue = session.createQueue("queue:///" + "DEV.QUEUE.1");
-            MessageProducer producer = session.createProducer(queue);
-            TextMessage message = session.createTextMessage();
-            message.setText("text");
-            producer.send(message);
-            producer.close();
-            connection.close();
-        } catch (JMSException e) {
-            e.printStackTrace();
-        } finally {
-            context.close();
-        }
-    }
-
-
-    public static void main(String[] args) throws NamingException, RemoteException, NotBoundException {
+    public static void main(String[] args) throws NamingException, RemoteException, NotBoundException, JMSException {
         ApplicationContext applicationContext = new ApplicationContext("com.mq");
         System.setProperty("sun.rmi.registry.registryFilter", "java.**;com.common.**");
         Properties env = new Properties();
@@ -53,14 +31,25 @@ public class Main {
         Context remoteContext = new InitialContext(env);
         try {
             RemoteContextHolder context = (RemoteContextHolder) remoteContext.lookup("context");
-            Context connection = context.getConnection();
-            connection.lookup(JNDI);
+            JmsConnectionFactory connection = context.getConnection();
+            connection.createConnection();
+            //connection.lookup(JNDI);
         } catch (NamingException | ClassCastException e) {
             e.printStackTrace();
         }
         Registry localhost = LocateRegistry.getRegistry("localhost", 2005);
 
         RemoteContextHolder context = (RemoteContextHolder) localhost.lookup("context");
-        lookup(context.getConnection());
+        JmsConnectionFactory connection = context.getConnection();
+        Connection connection1 = connection.createConnection();
+        connection1.start();
+        Session session = connection1.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Destination queue = session.createQueue("queue:///" + "DEV.QUEUE.1");
+        MessageProducer producer = session.createProducer(queue);
+        TextMessage message = session.createTextMessage();
+        message.setText("text");
+        producer.send(message);
+        producer.close();
+        connection1.close();
     }
 }

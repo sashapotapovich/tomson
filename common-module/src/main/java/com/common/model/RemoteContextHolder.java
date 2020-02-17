@@ -1,21 +1,11 @@
 package com.common.model;
 
+import com.ibm.msg.client.jms.JmsConnectionFactory;
 import java.io.Serializable;
 import java.rmi.Remote;
-import javax.naming.Context;
+import java.rmi.RemoteException;
 
-public class RemoteContextHolder implements Remote, Serializable {
+public interface RemoteContextHolder extends Remote, Serializable {
 
-    private static final long serialVersionUID = 2896539148290100009L;
-
-    public RemoteContextHolder(Context context) {
-        this.context = context;
-    }
-
-    private Context context;
-
-    public Context getConnection() {
-        return context;
-    }
-
+    JmsConnectionFactory getConnection() throws RemoteException;
 }

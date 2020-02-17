@@ -7,6 +7,37 @@ services:
     ports:
       - "10389:10389"
       - "10636:10636"
+  jenkins:
+    build:
+      context: jenkins
+      dockerfile: Dockerfile
+    volumes:
+      - ./jenkins/var/jenkins_home:/var/jenkins_home
+      - ./jenkins/var/home:/home
+      - ./jenkins/var/certs/client:/certs/client
+    environment:
+      DOCKER_HOST: tcp://docker:2376
+      DOCKER_CERT_PATH: /certs/client
+      DOCKER_TLS_VERIFY: 1
+    ports:
+    - "8085:8080"
+    - "50000:50000"
+  
+  dind:
+    privileged: true
+    build:
+      context: dind
+      dockerfile: Dockerfile
+    container_name: docker
+    volumes:
+    - ./jenkins/var/certs/client:/certs/client
+    - ./jenkins/var/jenkins_home:/var/jenkins_home
+    - ./jenkins/var/home:/home
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
+    ports:
+    - "2376:2376"
+
   database:
     build:
       context: postgres
@@ -23,13 +54,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "1414:1414"
-  app:
-    build:
-      context: app
-      dockerfile: Dockerfile
-    container_name: app
-    depends_on:
-      - database
-      - ldap
-    ports:
-      - "2005:2005"
+
+volumes:
+  jenkins-docker-certs:
+  jenkins-data:

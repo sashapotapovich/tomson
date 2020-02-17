@@ -6,7 +6,7 @@ import com.common.command.Command;
 import com.common.command.DeleteCustomerCommand;
 import com.common.command.ServerCommandManager;
 import com.common.model.Customer;
-import com.common.model.RemoteContextHolder;
+import com.common.model.RemoteContextHolderImpl;
 import com.mq.ConnectionFactory;
 import com.server.command.AddCustomerCommandImpl;
 import com.server.command.DeleteCustomerCommandImpl;
@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import javax.jms.JMSException;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -54,15 +55,13 @@ public class Main {
             context.createSubcontext("java:comp/env");
             context.createSubcontext("java:comp/env/jdbc");
             context.bind(JNDI, connectionFactory);
-            Remote adapter = new RemoteContextHolder(context);
-            Remote remoteContext = UnicastRemoteObject.exportObject(adapter, 2005);
-            registry.rebind("context", remoteContext);
+            
         } finally {
             context.close();
         }
     }
     
-    public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException, NamingException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException, NamingException, JMSException {
         log.info("Starting...");
         Class.forName("org.postgresql.Driver");
         System.setProperty("com.sun.jndi.rmi.object.trustURLCodebase", "true");
@@ -75,7 +74,10 @@ public class Main {
         ApplicationContext applicationContext = new ApplicationContext("com.server");
         connectionFactory = (ConnectionFactory) applicationContext.getBeanFactory().getBean("connectionFactory");
         Registry registry = LocateRegistry.createRegistry(2005);
-        bind(registry);
+       // bind(registry);
+        Remote adapter = new RemoteContextHolderImpl(connectionFactory.jmsConnectionFactory());
+        Remote remoteContext = UnicastRemoteObject.exportObject(adapter, 2005);
+        registry.rebind("context", remoteContext);
         ServerCommandManagerImpl scm = new ServerCommandManagerImpl();
 
         Map<Class, Command> commands = new HashMap<>();
