@@ -2,17 +2,16 @@ package org.server.server.servlet;
 
 
 import com.common.model.Customer;
-import org.server.dao.jdbc.CustomerJdbcDao;
 import java.io.PrintWriter;
 import java.util.List;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.server.dao.jdbc.CustomerJdbcDao;
 import org.test.di.annotations.Autowired;
 import org.test.di.annotations.Component;
 
 @Component
-public class CustomersListServlet extends HttpServlet implements CustomServlet {
+public class CustomersListServlet extends CustomServlet {
 	private static final long serialVersionUID = -835091317331676452L;
 	private static final String PATH = "/list";
 	

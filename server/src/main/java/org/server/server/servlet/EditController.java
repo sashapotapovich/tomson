@@ -1,8 +1,6 @@
 package org.server.server.servlet;
 
-import javax.servlet.http.HttpServlet;
-
-public class EditController extends HttpServlet implements CustomServlet {
+public class EditController extends CustomServlet {
     private static final String PATH = "/edit";
     
     
