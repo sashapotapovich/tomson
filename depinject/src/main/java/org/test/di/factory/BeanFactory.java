@@ -108,16 +108,6 @@ public class BeanFactory {
 
     public void instantiate(String basePackage) {
         try {
-            ClassLoader classLoader2 = ClassLoader.getSystemClassLoader();
-            Package[] definedPackages = classLoader2.getDefinedPackages();
-            for (Package definedPackage : definedPackages) {
-                log.error(definedPackage.getName());
-            }
-            ClassLoader classLoader3 = BeanFactory.class.getClassLoader();
-            Package[] definedPackages2 = classLoader3.getDefinedPackages();
-            for (Package definedPackage : definedPackages2) {
-                log.error(definedPackage.getName());
-            }
             ClassLoader classLoader = ClassUtil.getClassLoader();
             String path = basePackage.replace('.', '/');
             log.info("Path created - {}", path);
@@ -159,6 +149,7 @@ public class BeanFactory {
             try {
                 for (Pair<Field, Object> pair : pairs) {
                     Field field = pair.getLeft();
+                    log.info(field.getClass().getSimpleName());
                     log.info("Autowiring Field - {}", field.toGenericString());
                     field.setAccessible(true);
                     if (proxyList.contains(beanName)) {

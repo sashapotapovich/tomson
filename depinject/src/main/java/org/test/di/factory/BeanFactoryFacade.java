@@ -12,7 +12,6 @@ public class BeanFactoryFacade {
 
     public void initiate(String basePackage) {
         log.info("Context is under construction");
-        beanFactory.instantiate("org.test.bean.customprocessor");
         beanFactory.instantiate(basePackage);
         log.info("Bean Post Processors before initialization Beans");
         beanFactory.processBeforeBeanInitialization();

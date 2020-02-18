@@ -1,20 +1,18 @@
 package com.common.model;
 
-import com.ibm.msg.client.jms.JmsConnectionFactory;
-import javax.naming.Context;
+import javax.jms.ConnectionFactory;
 
 public class RemoteContextHolderImpl implements RemoteContextHolder {
 
     private static final long serialVersionUID = 2896539148290100009L;
+    private ConnectionFactory connectionFactory;
 
-    public RemoteContextHolderImpl(JmsConnectionFactory context) {
-        this.context = context;
+    public RemoteContextHolderImpl(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
     }
 
-    private JmsConnectionFactory context;
-
-    public JmsConnectionFactory getConnection() {
-        return context;
+    public ConnectionFactory getConnection() {
+        return connectionFactory;
     }
 
 }
