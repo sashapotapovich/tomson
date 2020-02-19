@@ -2,6 +2,8 @@ package org.server.server.servlet;
 
 import com.common.model.Customer;
 import java.io.PrintWriter;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.server.dao.jdbc.CustomerJdbcDao;
@@ -30,7 +32,7 @@ public class EditCustomerServlet extends CustomServlet {
             out.println("<body>");
             if (bySsn != null) {
                 out.println("<h1>Customers " + bySsn.getCustomerName() + "</h1>");
-                out.print("<form action=\"/edit\">\n" +
+                out.print("<form action=\"/customer\">\n" +
                                   "   <p><input name=\"customerName\" value=\"" + bySsn.getCustomerName() + "\"> " +
                                   "<input name=\"address\" value=\"" + bySsn.getAddress() +"\"> " +"></p>\n" +
                                   "   <p><input type=\"submit\"></p>");
@@ -44,7 +46,15 @@ public class EditCustomerServlet extends CustomServlet {
             throwable.printStackTrace();
         }
     }
+    
+    @Override
+    public void doPost(HttpServletRequest req, HttpServletResponse resp){
+        Map<String, List<String>> stringListMap = HttpUtils.splitQuery(req.getQueryString());
+        
+    }
 
+    
+    
     public String getPath() {
         return PATH;
     }

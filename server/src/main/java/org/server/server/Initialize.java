@@ -16,11 +16,7 @@ import org.test.di.annotations.PostConstruct;
 public class Initialize {
     
     private static final Logger log = LoggerFactory.getLogger(Initialize.class);
-
-    /*@Autowired
-    private CustomersListServlet customersListServlet;
-    @Autowired
-    private EditCustomerServlet editCustomerServlet;*/
+    
     @Autowired
     List<CustomServlet> servlets;
     
@@ -30,8 +26,6 @@ public class Initialize {
         log.info("Starting Server at port - {}", port);
         HttpServer server = HttpServer.create(new InetSocketAddress(8090), 0);
         servlets.forEach(servlet -> server.createContext(servlet.getPath(), new HttpHandlerWithServletSupport(servlet)));
-        /*server.createContext(customersListServlet.getPath(), new HttpHandlerWithServletSupport(customersListServlet));
-        server.createContext(editCustomerServlet.getPath(), new HttpHandlerWithServletSupport(editCustomerServlet));*/
         
         server.setExecutor(null);
         server.start();

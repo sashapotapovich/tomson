@@ -144,7 +144,7 @@ public class BeanFactory {
                 for (Field field : autowireCandidates.get(beanName)) {
                     log.info("Autowiring Field - {}", field.toGenericString());
                     log.error("Type Class - {}", field.getGenericType().getTypeName());
-                    if(Collection.class.isAssignableFrom(field.getType())) {
+                    if (Collection.class.isAssignableFrom(field.getType())) {
                         Type genericType = field.getGenericType();
                         if (genericType instanceof ParameterizedType) {
                             Type[] parameters = ((ParameterizedType) genericType).getActualTypeArguments();
@@ -152,7 +152,7 @@ public class BeanFactory {
                                 log.error("Type class - {}", param.getTypeName());
                                 Class<?> aClass = Class.forName(param.getTypeName());
                                 Collection<Object> allBeansForType = ServiceLocator.getAllBeansForType(aClass);
-                                if(!allBeansForType.isEmpty()){
+                                if (!allBeansForType.isEmpty()) {
                                     String simpleName = field.getDeclaringClass().getSimpleName();
                                     simpleName = simpleName.substring(0, 1).toLowerCase() + simpleName.substring(1);
                                     Object target = ServiceLocator.getBean(simpleName);
