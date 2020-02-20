@@ -30,6 +30,15 @@ public class JdbcDaoSupport {
 
 		return id;
 	}
+	
+	public <T extends Entity> T save(String sql, T obj){
+        try (Connection con = getConnection(); PreparedStatement statement = con.prepareStatement(sql)) {
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return obj;
+    }
 
 	public <T> T selectOne(String sql, RowMapper<T> rowMapper, Long param) {
 		T obj = null;

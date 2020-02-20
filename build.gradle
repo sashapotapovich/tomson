@@ -9,6 +9,6 @@ targetCompatibility = '11'
 
 
 dependencies {
-    compile project(':jndi')
+    compile project(':server')
     compile project(':depinject')
 }

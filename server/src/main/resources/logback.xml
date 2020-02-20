@@ -18,7 +18,23 @@
     </appender>
 
     <logger name="liquibase" level="INFO"/>
-    <!-- Configure so that it outputs to both console and log file -->
+
+    <logger name="org.hibernate">
+        <level value="ERROR"/>
+    </logger>
+
+    <logger name="org.hibernate.SQL">
+        <level value="DEBUG"/>
+    </logger>
+
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder">
+        <level value="DEBUG" />
+    </logger>
+    
+    <logger name="com.mchange.v2.c3p0.impl.C3P0PooledConnectionPoolManager">
+        <level value="DEBUG" />
+    </logger>
+    
     <root level="ALL">
         <appender-ref ref="stdout" />
     </root>

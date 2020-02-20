@@ -12,44 +12,56 @@ import java.rmi.Remote;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.jms.JMSException;
-import javax.naming.NamingException;
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.exception.LiquibaseException;
-import liquibase.resource.ClassLoaderResourceAccessor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.mq.ConnectionFactory;
 import org.postgresql.Driver;
 import org.server.command.AddCustomerCommandImpl;
 import org.server.command.DeleteCustomerCommandImpl;
 import org.test.di.app.ApplicationContext;
 
-import static ch.qos.logback.core.db.DBHelper.closeConnection;
-
 @Slf4j
 public class Main {
 
     private static ConnectionFactory connectionFactory;
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException, NamingException, JMSException {
+    public static void main(String[] args) throws IOException, SQLException, JMSException {
         log.info("Starting...");
-        Class.forName("org.postgresql.Driver");
+        final StandardServiceRegistry dbRegistry =
+                new StandardServiceRegistryBuilder()
+                        .configure("hibernate.cfg.xml")
+                        .build();
+
+        SessionFactory sessionFactory = null;
+
+        try {
+            sessionFactory = new MetadataSources(dbRegistry).buildMetadata()
+                                                          .buildSessionFactory();
+        } catch (Exception e) {
+            StandardServiceRegistryBuilder.destroy(dbRegistry);
+            log.error("cannot create sessionFactory", e);
+            System.exit(1);
+        }
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        
         //System.setProperty("com.sun.jndi.rmi.object.trustURLCodebase", "true");
         //System.setProperty("com.sun.jndi.cosnaming.object.trustURLCodebase", "true");
         /*System.setProperty("sun.rmi.registry.registryFilter", "java.**;com.common.**");*/
         DriverManager.registerDriver(new Driver());
         //System.setProperty("java.rmi.server.codebase", "http://localhost:2005");
         //log.info(System.getProperty("java.security.policy"));
-        liquibaseUpdateWithChangelog();
         ApplicationContext applicationContext = new ApplicationContext("org");
         connectionFactory = (ConnectionFactory) applicationContext.getBeanFactory().getBean("connectionFactory");
         Registry registry = LocateRegistry.createRegistry(2005);
@@ -67,30 +79,12 @@ public class Main {
         int ssn = ThreadLocalRandom.current().nextInt();
         AddCustomerCommandImpl addCustomerCommand = new AddCustomerCommandImpl();
         addCustomerCommand.execute(new Customer(String.valueOf(ssn), "ASD", "ZXC"));
+        int ssn2 = ThreadLocalRandom.current().nextInt();
+        Customer customer = new Customer(String.valueOf(ssn2), "Test", "Test");
+        session.persist(customer);
+        transaction.commit();
+
         log.info("Running...");
     }
-
-    public static void liquibaseUpdateWithChangelog() {
-        Connection connection = null;
-        try {
-            connection = getConnection();
-            log.info("Schema - {}", connection.getSchema());
-            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
-            log.info("Starting liquibase");
-            Liquibase liquibase = new Liquibase("db/changelog.xml", new ClassLoaderResourceAccessor(), database);
-            liquibase.update("");
-        } catch (LiquibaseException | SQLException | ClassNotFoundException e) {
-            log.error("", e);
-        } finally {
-            if (connection != null) {
-                closeConnection(connection);
-            }
-        }
-    }
-
-    public static Connection getConnection() throws SQLException, ClassNotFoundException {
-        Class.forName("org.postgresql.Driver");
-        log.info("Trying to get connection");
-        return DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "postgres");
-    }
+    
 }

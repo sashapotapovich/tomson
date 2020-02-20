@@ -1,21 +1,33 @@
 package com.common.model;
 
 
-import com.common.annotation.CrearecAliasSql;
 import com.common.annotation.CrearecNotSql;
-import lombok.AllArgsConstructor;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
+@javax.persistence.Entity
+@Table(name = "customer")
 public class Customer extends Entity implements CustomerTO {
-	@CrearecNotSql
-	private static final long serialVersionUID = 1270898336029025561L;
+    @CrearecNotSql
+    private static final long serialVersionUID = 1270898336029025561L;
 
-	private String ssn;
-	@CrearecAliasSql("cust_name")
-	private String customerName;
-	private String address;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @NonNull
+    private String ssn;
+    @NonNull
+    private String customerName;
+    @NonNull
+    private String address;
 }

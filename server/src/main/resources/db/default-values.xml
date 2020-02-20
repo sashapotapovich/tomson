@@ -10,104 +10,46 @@
 		</preConditions>
 
 		<insert tableName="customer">
+            <column name="id" value="1"/>
 			<column name="ssn" value="ssn1"/>
-			<column name="cust_name" value="test1"/>
+			<column name="customername" value="test1"/>
 			<column name="address" value="address1"/>
 		</insert>
 		<insert tableName="customer">
+            <column name="id" value="2"/>
 			<column name="ssn" value="ssn2"/>
-			<column name="cust_name" value="test2"/>
+			<column name="customername" value="test2"/>
 			<column name="address" value="address2"/>
 		</insert>
 		<insert tableName="customer">
+            <column name="id" value="3"/>
 			<column name="ssn" value="ssn3"/>
-			<column name="cust_name" value="test3"/>
+			<column name="customername" value="test3"/>
 			<column name="address" value="address3"/>
 		</insert>
 		<insert tableName="customer">
+            <column name="id" value="4"/>
 			<column name="ssn" value="ssn4"/>
-			<column name="cust_name" value="test4"/>
+			<column name="customername" value="test4"/>
 			<column name="address" value="address4"/>
 		</insert>
 		<insert tableName="customer">
+            <column name="id" value="5"/>
 			<column name="ssn" value="ssn5"/>
-			<column name="cust_name" value="test5"/>
+			<column name="customername" value="test5"/>
 			<column name="address" value="address5"/>
 		</insert>
 		<insert tableName="customer">
+            <column name="id" value="6"/>
 			<column name="ssn" value="ssn6"/>
-			<column name="cust_name" value="test6"/>
+			<column name="customername" value="test6"/>
 			<column name="address" value="address6"/>
 		</insert>
 		<insert tableName="customer">
+            <column name="id" value="7"/>
 			<column name="ssn" value="ssn7"/>
-			<column name="cust_name" value="test7"/>
+			<column name="customername" value="test7"/>
 			<column name="address" value="address7"/>
-		</insert>
-		<insert tableName="customer">
-			<column name="ssn" value="ssn8"/>
-			<column name="cust_name" value="test8"/>
-			<column name="address" value="address8"/>
-		</insert>
-		<insert tableName="customer">
-			<column name="ssn" value="ssn9"/>
-			<column name="cust_name" value="test9"/>
-			<column name="address" value="address9"/>
-		</insert>
-		<insert tableName="customer">
-			<column name="ssn" value="ssn10"/>
-			<column name="cust_name" value="test10"/>
-			<column name="address" value="address10"/>
-		</insert>
-		<insert tableName="customer">
-			<column name="ssn" value="ssn11"/>
-			<column name="cust_name" value="test11"/>
-			<column name="address" value="address11"/>
-		</insert>
-		<insert tableName="customer">
-			<column name="ssn" value="ssn12"/>
-			<column name="cust_name" value="test12"/>
-			<column name="address" value="address12"/>
-		</insert>
-		<insert tableName="customer">
-			<column name="ssn" value="ssn13"/>
-			<column name="cust_name" value="test13"/>
-			<column name="address" value="address13"/>
-		</insert>
-		<insert tableName="customer">
-			<column name="ssn" value="ssn14"/>
-			<column name="cust_name" value="test14"/>
-			<column name="address" value="address14"/>
-		</insert>
-		<insert tableName="customer">
-			<column name="ssn" value="ssn15"/>
-			<column name="cust_name" value="test15"/>
-			<column name="address" value="address15"/>
-		</insert>
-		<insert tableName="customer">
-			<column name="ssn" value="ssn16"/>
-			<column name="cust_name" value="test16"/>
-			<column name="address" value="address16"/>
-		</insert>
-		<insert tableName="customer">
-			<column name="ssn" value="ssn17"/>
-			<column name="cust_name" value="test17"/>
-			<column name="address" value="address17"/>
-		</insert>
-		<insert tableName="customer">
-			<column name="ssn" value="ssn18"/>
-			<column name="cust_name" value="test18"/>
-			<column name="address" value="address18"/>
-		</insert>
-		<insert tableName="customer">
-			<column name="ssn" value="ssn19"/>
-			<column name="cust_name" value="test19"/>
-			<column name="address" value="address19"/>
-		</insert>
-		<insert tableName="customer">
-			<column name="ssn" value="ssn20"/>
-			<column name="cust_name" value="test20"/>
-			<column name="address" value="address20"/>
 		</insert>
 	</changeSet>
 </databaseChangeLog>

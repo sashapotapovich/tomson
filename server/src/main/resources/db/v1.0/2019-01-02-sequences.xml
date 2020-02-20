@@ -7,9 +7,9 @@
 	<changeSet id="2019-01-02-sequences-shares_seq" author="CreaRec">
 		<preConditions onFail="MARK_RAN">
 			<not>
-				<sequenceExists sequenceName="shares_seq"/>
+				<sequenceExists sequenceName="hibernate_sequence"/>
 			</not>
 		</preConditions>
-		<createSequence sequenceName="shares_seq" startValue="1" incrementBy="1"/>
+		<createSequence sequenceName="hibernate_sequence" startValue="8" incrementBy="1"/>
 	</changeSet>
 </databaseChangeLog>
