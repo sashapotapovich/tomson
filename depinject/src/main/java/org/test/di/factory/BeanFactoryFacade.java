@@ -8,8 +8,7 @@ public class BeanFactoryFacade {
     private static final Logger log = LoggerFactory.getLogger(BeanFactoryFacade.class);
 
     private BeanFactory beanFactory = new BeanFactory();
-
-
+    
     public void initiate(String basePackage) {
         log.info("Context is under construction");
         beanFactory.instantiate(basePackage);

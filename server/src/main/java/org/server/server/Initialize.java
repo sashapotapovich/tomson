@@ -1,11 +1,11 @@
 package org.server.server;
 
-import org.server.server.servlet.CustomersListServlet;
-import org.server.server.servlet.EditCustomerServlet;
-import org.server.server.servlet.wrapper.HttpHandlerWithServletSupport;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.List;
+import org.server.server.servlet.CustomServlet;
+import org.server.server.servlet.wrapper.HttpHandlerWithServletSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.test.di.annotations.Autowired;
@@ -16,21 +16,16 @@ import org.test.di.annotations.PostConstruct;
 public class Initialize {
     
     private static final Logger log = LoggerFactory.getLogger(Initialize.class);
-
+        
     @Autowired
-    private CustomersListServlet customersListServlet;
-    @Autowired
-    private EditCustomerServlet editCustomerServlet;
+    List<CustomServlet> servlets;
     
     @PostConstruct
     public void run() throws IOException {
-        int port = 0;
+        int port = 8090;
         log.info("Starting Server at port - {}", port);
         HttpServer server = HttpServer.create(new InetSocketAddress(8090), 0);
-
-        server.createContext(customersListServlet.getPath(), new HttpHandlerWithServletSupport(customersListServlet));
-        server.createContext(editCustomerServlet.getPath(), new HttpHandlerWithServletSupport(editCustomerServlet));
-        
+        servlets.forEach(servlet -> server.createContext(servlet.getPath(), new HttpHandlerWithServletSupport(servlet)));
         server.setExecutor(null);
         server.start();
         log.info("Server is running");

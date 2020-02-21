@@ -1,5 +1,7 @@
 package org.server.server.servlet;
 
-public interface CustomServlet {
-    String getPath();
+import javax.servlet.http.HttpServlet;
+
+public abstract class CustomServlet extends HttpServlet{
+    public abstract String getPath();
 }

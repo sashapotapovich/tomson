@@ -4,17 +4,19 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -22,21 +24,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.test.di.annotations.Autowired;
 import org.test.di.annotations.Component;
-import org.test.di.annotations.Scope;
 import org.test.di.config.BeanPostProcessor;
+import org.test.di.exceptions.BeanNotFoundException;
 import org.test.di.service.Cache;
 import org.test.di.service.ServiceLocator;
 import org.test.di.utils.ClassUtil;
-import org.test.di.utils.Pair;
 
 public class BeanFactory {
     private static final Logger log = LoggerFactory.getLogger(BeanFactory.class);
 
-    private Map<String, List<Pair<Field, Object>>> autowireCandidates = new HashMap<>();
+    private Map<String, List<Field>> autowireCandidates = new HashMap<>();
+    private Cache context = Cache.getInstance();
     private PriorityQueue<BeanPostProcessor> postProcessors = new PriorityQueue<>(Comparator.comparing(BeanPostProcessor::getPriority));
-    private List<String> proxyList = new ArrayList<>();
-    private ProxyBeanGenerationStrategy proxyStrategy = new ProxyBeanGenerationStrategy();
-    private SingletonBeanGenerationStrategy singletonStrategy = new SingletonBeanGenerationStrategy();
 
     private void addPostProcessor(BeanPostProcessor postProcessor) {
         log.info("Registering Bean Post Processors");
@@ -54,19 +53,15 @@ public class BeanFactory {
                     //return;
                 }
                 Component component = classObject.getAnnotation(Component.class);
-                Scope value = component.value();
                 String beanName = className.substring(0, 1).toLowerCase() + className.substring(1);
                 log.info("Generated BEAN name - {}", beanName);
-                if (value.equals(Scope.PROXY)) {
-                    proxyList.add(beanName);
-                }
-                Cache.getInstance().addBean(beanName, new Pair<Class<?>, Object>(classObject, instance));
+                context.addBean(beanName, instance);
                 for (Field field : classObject.getDeclaredFields()) {
                     if (field.isAnnotationPresent(Autowired.class)) {
                         String classNameForAuto = field.getType().getSimpleName();
                         String fieldName = classNameForAuto.substring(0, 1).toLowerCase() + classNameForAuto.substring(1);
-                        autowireCandidates.computeIfAbsent(fieldName, (k) -> new ArrayList<>())
-                                          .add(new Pair<>(field, instance));
+                        autowireCandidates.computeIfAbsent(fieldName, k -> new ArrayList<>())
+                                          .add(field);
                     }
                 }
             }
@@ -145,23 +140,37 @@ public class BeanFactory {
     public void populateProperties() {
         autowireCandidates.keySet().forEach(value -> log.info("Autowire Candidates held in list - {}", value));
         for (String beanName : autowireCandidates.keySet()) {
-            List<Pair<Field, Object>> pairs = autowireCandidates.get(beanName);
             try {
-                for (Pair<Field, Object> pair : pairs) {
-                    Field field = pair.getLeft();
-                    log.info(field.getClass().getSimpleName());
+                for (Field field : autowireCandidates.get(beanName)) {
                     log.info("Autowiring Field - {}", field.toGenericString());
-                    field.setAccessible(true);
-                    if (proxyList.contains(beanName)) {
-                        Object bean = ServiceLocator.getBean(beanName, proxyStrategy);
-                        field.set(pair.getRight(), bean);
+                    if (Collection.class.isAssignableFrom(field.getType())) {
+                        Type genericType = field.getGenericType();
+                        if (genericType instanceof ParameterizedType) {
+                            Type[] parameters = ((ParameterizedType) genericType).getActualTypeArguments();
+                            for (Type param : parameters) {
+                                Class<?> aClass = Class.forName(param.getTypeName());
+                                Collection<Object> allBeansForType = ServiceLocator.getAllBeansForType(aClass);
+                                if (!allBeansForType.isEmpty()) {
+                                    String simpleName = field.getDeclaringClass().getSimpleName();
+                                    simpleName = simpleName.substring(0, 1).toLowerCase() + simpleName.substring(1);
+                                    Object target = ServiceLocator.getBean(simpleName);
+                                    field.setAccessible(true);
+                                    field.set(target, allBeansForType);
+                                    field.setAccessible(false);
+                                }
+                            }
+                        }
                     } else {
-                        Object bean = ServiceLocator.getBean(beanName, singletonStrategy);
-                        field.set(pair.getRight(), bean);
+                        field.setAccessible(true);
+                        String simpleName = field.getDeclaringClass().getSimpleName();
+                        simpleName = simpleName.substring(0, 1).toLowerCase() + simpleName.substring(1);
+                        Object target = ServiceLocator.getBean(simpleName);
+                        Object bean = ServiceLocator.getBean(beanName);
+                        field.set(target, bean);
+                        field.setAccessible(false);
                     }
-                    field.setAccessible(false);
                 }
-            } catch (IllegalAccessException e) {
+            } catch (IllegalAccessException | BeanNotFoundException | ClassNotFoundException e) {
                 log.error(e.toString());
             }
         }
@@ -169,8 +178,9 @@ public class BeanFactory {
 
     public void processBeforeBeanInitialization() {
         if (!postProcessors.isEmpty()) {
-            for (String name : Cache.getInstance().getAllBeanNames()) {
-                Object bean = Cache.getInstance().getBean(name);
+            for (Object bean : context.getAllBeans()) {
+                String name = bean.getClass().getSimpleName();
+                name = name.substring(0, 1).toLowerCase() + name.substring(1);
                 for (BeanPostProcessor postProcessor : postProcessors) {
                     postProcessor.postProcessBeforeInitialization(name, bean);
                 }
@@ -180,8 +190,9 @@ public class BeanFactory {
 
     public void processAfterBeanInitialization() {
         if (!postProcessors.isEmpty()) {
-            for (String name : Cache.getInstance().getAllBeanNames()) {
-                Object bean = Cache.getInstance().getBean(name);
+            for (Object bean : context.getAllBeans()) {
+                String name = bean.getClass().getSimpleName();
+                name = name.substring(0, 1).toLowerCase() + name.substring(1);
                 for (BeanPostProcessor postProcessor : postProcessors) {
                     postProcessor.postProcessAfterInitialization(name, bean);
                 }
@@ -190,15 +201,15 @@ public class BeanFactory {
     }
 
     public Object getBean(String beanName) {
-        return Cache.getInstance().getBean(beanName);
+        return context.getBean(beanName);
     }
 
-    public Set<String> getAllBeans() {
-        return Cache.getInstance().getAllBeanNames();
+    public Collection<Object> getAllBeans() {
+        return context.getAllBeans();
     }
 
     public void close() {
-        Cache.getInstance().clear();
+        context.clear();
         postProcessors.clear();
     }
 }
