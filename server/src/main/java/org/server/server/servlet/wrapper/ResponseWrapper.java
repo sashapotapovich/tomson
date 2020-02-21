@@ -86,4 +86,9 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
             ex.close();
         }
     }
+
+    public void sendRedirect(String location) throws IOException {
+        setHeader("Location", location);
+        setStatus(302);        
+    } 
 }

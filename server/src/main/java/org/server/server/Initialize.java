@@ -26,9 +26,6 @@ public class Initialize {
         log.info("Starting Server at port - {}", port);
         HttpServer server = HttpServer.create(new InetSocketAddress(8090), 0);
         servlets.forEach(servlet -> server.createContext(servlet.getPath(), new HttpHandlerWithServletSupport(servlet)));
-        servlets.forEach(servlet -> log.info("Servlet - {}", servlet));
-        servlets.forEach(servlet -> log.info("Servlet - {}", servlet.getPath()));
-        
         server.setExecutor(null);
         server.start();
         log.info("Server is running");

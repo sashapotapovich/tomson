@@ -34,6 +34,10 @@
     <logger name="com.mchange.v2.c3p0.impl.C3P0PooledConnectionPoolManager">
         <level value="DEBUG" />
     </logger>
+
+    <logger name="org.server">
+        <level value="TRACE" />
+    </logger>
     
     <root level="ALL">
         <appender-ref ref="stdout" />

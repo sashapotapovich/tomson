@@ -4,8 +4,6 @@ package org.server.server;
 import com.common.command.Command;
 import com.common.command.ServerCommandManager;
 import com.common.model.TransferObject;
-import org.server.annotation.CrearecBeanState;
-import org.server.executor.RejectedExecutionHandlerImpl;
 import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -18,6 +16,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.server.executor.RejectedExecutionHandlerImpl;
 
 @Slf4j
 public class ServerCommandManagerImpl implements ServerCommandManager {
@@ -42,17 +41,17 @@ public class ServerCommandManagerImpl implements ServerCommandManager {
 		Command command = commands.get(clazz);
 		Class<? extends Command> implClass = command.getClass();
 		log.info("blah-blah - {}", implClass.getName());
-        switch (implClass.getAnnotation(CrearecBeanState.class).value()) {
+        /*switch (implClass.getAnnotation(CrearecBeanState.class).value()) {
             case STATELESS:
                 return (D) command.execute(obj);
             case STATEFUL:
-			default:
+			default:*/
 				try {
 					return EXECUTOR_SERVICE.submit(new Worker<D>(implClass.newInstance(), obj)).get();
 				} catch (InstantiationException | IllegalAccessException e) {
 				    log.error("execute exception - {}", e.getMessage());
 					throw new RuntimeException(e);
 				}
-		}
+		//}
 	}
 }

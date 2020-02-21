@@ -3,6 +3,7 @@ package org.server.server.servlet;
 
 import com.common.model.Customer;
 import java.io.PrintWriter;
+import java.util.Comparator;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +30,7 @@ public class CustomersListServlet extends CustomServlet {
 			out.println("<body>");
 			out.println("<h1>Customers list</h1>");
 			List<Customer> all = customerDao.findAll();
+            all.sort(Comparator.comparingLong(Customer::getId));
 			all.forEach(item -> {
 				out.println("<p><a href=/customer?" + item.getSsn() + ">" + item.getSsn() + "</a>"
                                     + " " + item.getCustomerName() + " " + item.getAddress() + "</p>");
