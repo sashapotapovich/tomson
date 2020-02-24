@@ -1,4 +1,4 @@
-package org.server.server.servlet;
+package org.web.servlet;
 
 import javax.servlet.http.HttpServlet;
 

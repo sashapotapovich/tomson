@@ -4,4 +4,5 @@ include 'depinject'
 include 'common-module'
 include 'server'
 include 'mq'
+include 'web'
 

@@ -1,14 +1,17 @@
-package org.server.server.servlet.wrapper;
+package org.web.servlet.wrapper;
 
 import com.sun.net.httpserver.HttpExchange;
-
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 
 public final class RequestWrapper extends HttpServletRequestWrapper {
     private final HttpExchange ex;

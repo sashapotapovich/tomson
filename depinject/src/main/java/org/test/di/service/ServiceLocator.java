@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.test.di.exceptions.BeanNotFoundException;
+import org.test.di.factory.Bean;
 
 public class ServiceLocator {
     
@@ -13,21 +14,21 @@ public class ServiceLocator {
     private ServiceLocator() {
     }
 
-    public static Object getBean(String beanName) throws BeanNotFoundException {
-        Object bean = Cache.getInstance().getBean(beanName);
+    public static Bean getBean(String beanName) throws BeanNotFoundException {
+        Bean bean = Cache.getInstance().getBean(beanName);
         if (bean != null) {
             return bean;
         }
-        throw new BeanNotFoundException("Bean - " + beanName + "was not found!");
+        throw new BeanNotFoundException("Bean - " + beanName + " was not found!");
     }
     
     @SuppressWarnings("unchecked")
     public static Collection<Object> getAllBeansForType(Class<?> genericType) {
-        Collection<Object> allBeans = Cache.getInstance().getAllBeans();
+        Collection<Bean> allBeans = Cache.getInstance().getAllBeans();
         Collection<Object> beans = new ArrayList<>();
-        for (Object bean : allBeans) {
-            if (genericType.isAssignableFrom(bean.getClass())){
-                beans.add(bean);
+        for (Bean bean : allBeans) {
+            if (genericType.isAssignableFrom(bean.getInstance().getClass())){
+                beans.add(bean.getInstance());
             }
         }
         return beans;

@@ -1,22 +1,20 @@
-package org.server.server;
+package org.web;
 
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
-import org.server.server.servlet.CustomServlet;
-import org.server.server.servlet.wrapper.HttpHandlerWithServletSupport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.test.di.annotations.Autowired;
 import org.test.di.annotations.Component;
 import org.test.di.annotations.PostConstruct;
+import org.web.servlet.CustomServlet;
+import org.web.servlet.wrapper.HttpHandlerWithServletSupport;
 
 @Component
+@Slf4j
 public class Initialize {
-    
-    private static final Logger log = LoggerFactory.getLogger(Initialize.class);
-        
+            
     @Autowired
     List<CustomServlet> servlets;
     
@@ -24,7 +22,8 @@ public class Initialize {
     public void run() throws IOException {
         int port = 8090;
         log.info("Starting Server at port - {}", port);
-        HttpServer server = HttpServer.create(new InetSocketAddress(8090), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+        servlets.forEach(customServlet -> log.info("{} servlet registered", customServlet.getPath()));
         servlets.forEach(servlet -> server.createContext(servlet.getPath(), new HttpHandlerWithServletSupport(servlet)));
         server.setExecutor(null);
         server.start();

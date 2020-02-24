@@ -1,7 +1,7 @@
 package com.common.model;
 
 
-import com.common.annotation.CrearecNotSql;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -14,11 +14,9 @@ import lombok.RequiredArgsConstructor;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-@javax.persistence.Entity
+@Entity
 @Table(name = "customer")
-public class Customer extends Entity implements CustomerTO {
-    @CrearecNotSql
-    private static final long serialVersionUID = 1270898336029025561L;
+public class Customer implements CustomerTO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -30,4 +28,8 @@ public class Customer extends Entity implements CustomerTO {
     private String customerName;
     @NonNull
     private String address;
+    
+    public void setErrorMessage(String message){
+        System.err.println("setErrorMessage invoked for - " + message);
+    }
 }

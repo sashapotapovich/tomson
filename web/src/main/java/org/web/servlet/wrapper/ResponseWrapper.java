@@ -1,4 +1,4 @@
-package org.server.server.servlet.wrapper;
+package org.web.servlet.wrapper;
 
 import com.sun.net.httpserver.HttpExchange;
 import java.io.ByteArrayOutputStream;
@@ -58,7 +58,9 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
     public void sendError(int sc, String msg) throws IOException {
         this.status = sc;
         if (msg != null) {
-            printWriter.write(msg);
+            String errorMessage = "<p><b>" + sc + "</b></p>" + "<p>" + msg + "</p>";
+            printWriter.write(errorMessage);
+           // complete();
         }
     }
 

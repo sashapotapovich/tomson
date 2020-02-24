@@ -16,9 +16,8 @@
             <outputPatternAsHeader>false</outputPatternAsHeader>
         </encoder>
     </appender>
-
-    <!-- Configure so that it outputs to both console and log file -->
-    <root level="ALL">
+    
+    <root level="DEBUG">
         <appender-ref ref="stdout" />
     </root>
 </configuration>

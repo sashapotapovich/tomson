@@ -19,27 +19,13 @@
 
     <logger name="liquibase" level="INFO"/>
 
-    <logger name="org.hibernate">
-        <level value="ERROR"/>
+    <logger name="org.hibernate" level="ERROR">
     </logger>
 
-    <logger name="org.hibernate.SQL">
-        <level value="DEBUG"/>
-    </logger>
-
-    <logger name="org.hibernate.type.descriptor.sql.BasicBinder">
-        <level value="DEBUG" />
+    <logger name="org.hibernate.SQL" level="DEBUG">
     </logger>
     
-    <logger name="com.mchange.v2.c3p0.impl.C3P0PooledConnectionPoolManager">
-        <level value="DEBUG" />
-    </logger>
-
-    <logger name="org.server">
-        <level value="TRACE" />
-    </logger>
-    
-    <root level="ALL">
+    <root level="DEBUG">
         <appender-ref ref="stdout" />
     </root>
 </configuration>
