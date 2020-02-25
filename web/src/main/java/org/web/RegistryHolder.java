@@ -12,7 +12,7 @@ public class RegistryHolder {
     
     @PostConstruct
     private void init() throws RemoteException {
-         registry = LocateRegistry.getRegistry("localhost", 2005);
+         registry = LocateRegistry.getRegistry("app", 2005);
     }
 
     public Registry getRegistry() {

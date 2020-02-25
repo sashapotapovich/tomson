@@ -30,23 +30,15 @@ public class EditCustomerServlet extends CustomServlet {
     private FindCustomerByIdCommand findCustomerByIdCommand;
     private UpdateCustomerCommand updateCustomerCommand;
     
-/*    @PostConstruct
-    private void initialize() throws RemoteException, NotBoundException {
-        findCustomerByIdCommand = (FindCustomerByIdCommand) 
-                registryHolder.getRegistry().lookup(FindCustomerByIdCommand.class.getSimpleName());
-        updateCustomerCommand = (UpdateCustomerCommand) 
-                registryHolder.getRegistry().lookup(UpdateCustomerCommand.class.getSimpleName());
-    }*/
-    
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse response) throws IOException {
         try {
             findCustomerByIdCommand = (FindCustomerByIdCommand)
                     registryHolder.getRegistry().lookup(FindCustomerByIdCommand.class.getSimpleName());
         } catch (RemoteException | NotBoundException e) {
             response.sendError(503, "RMI server not found");
         }
-        String id = request.getRequestURI().substring(PATH.length() + 1);
+        String id = req.getRequestURI().substring(PATH.length() + 1);
         log.debug("Customer's ID - {}", id);
         Customer customer = new Customer();
         customer.setId(Long.valueOf(id));
@@ -60,22 +52,27 @@ public class EditCustomerServlet extends CustomServlet {
             out.println("<body>");
             if (current != null) {
                 out.println("<h1>Customers " + current.getCustomerName() + "</h1>");
-                out.println("<form method=\"post\" action=\"#\">\n");
-                out.println("<label for=\"fname\">SSN:</label>");
+                out.println("<form method=\"post\" action=\"#\">");
+                out.println("<p><label for=\"fname\">SSN:</label>");
                 out.println("<label for=\"cname\">Customer Name:</label>");
-                out.println("<label for=\"caddr\">Address:</label>");
-                out.print(" <p><input name=\"ssn\" id=\"fname\" value=\"" + current.getSsn() + "\"> " +
-                          "<input name=\"customerName\" id=\"cname\" value=\"" + current.getCustomerName() + "\"> " +
-                          "<input name=\"address\" id=\"caddr\" value=\"" + current.getAddress() +"\"></p>\n" +
-                          "   <p><input type=\"submit\"></p>");
-
+                out.println("<label for=\"caddr\">Address:</label></p>");
+                out.println("<p><input name=\"ssn\" id=\"fname\" value=\"" + current.getSsn() + "\">");
+                out.println("<input name=\"customerName\" id=\"cname\" value=\"" + current.getCustomerName() + "\"> ");
+                out.println("<input name=\"address\" id=\"caddr\" value=\"" + current.getAddress() +"\"></p>\n");
+                out.println("<p><input type=\"submit\"></p>");
+                out.println("</form>");
+                out.println("<input type=\"submit\" value=\"Delete Customer\"\n" +
+                                    "onclick=\"window.location='/delete?id=" + current.getId() + "'\"/> ");
+                out.println("<input type=\"submit\" value=\"Back\"\n" +
+                                    "onclick=\"window.location='/list'\"/>");
             } else {
                 out.println("<p> Not Found </p>");
             }
             out.println("</body>");
             out.println("</html>");
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+        } catch (IOException ex) {
+           log.error("EditCustomerServlet", ex);
+           response.sendError(503, ex.getMessage());
         }
     }
     

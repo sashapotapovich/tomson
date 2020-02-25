@@ -50,7 +50,7 @@ jar {
     manifest {
         attributes(
                 //'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
-                'Main-Class': 'com.server.server.Main'
+                'Main-Class': 'org.web.Main'
         )
     }
     from {

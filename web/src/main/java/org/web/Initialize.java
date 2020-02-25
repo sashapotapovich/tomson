@@ -1,5 +1,7 @@
 package org.web;
 
+import com.sun.net.httpserver.BasicAuthenticator;
+import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -24,9 +26,26 @@ public class Initialize {
         log.info("Starting Server at port - {}", port);
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         servlets.forEach(customServlet -> log.info("{} servlet registered", customServlet.getPath()));
-        servlets.forEach(servlet -> server.createContext(servlet.getPath(), new HttpHandlerWithServletSupport(servlet)));
+        servlets.forEach(servlet -> {
+            HttpContext context = server.createContext(servlet.getPath(), new HttpHandlerWithServletSupport(servlet));
+            context.setAuthenticator(new CustomAuthenticator(servlet.getPath()));
+        });
         server.setExecutor(null);
         server.start();
         log.info("Server is running");
+    }
+    
+    class CustomAuthenticator extends BasicAuthenticator{
+        
+        private UserAuthentication authentication = new UserAuthentication();
+
+        public CustomAuthenticator(String realm) {
+            super(realm);
+        }
+
+        @Override
+        public boolean checkCredentials(String user, String pwd) {
+            return authentication.authenticate(user, pwd);
+        }
     }
 }

@@ -23,18 +23,18 @@ public class CustomersListServlet extends CustomServlet {
 	private static final String PATH = "/list";
     private FindAllCustomersCommand findAllCustomersCommand;
     @Autowired
-    private RegistryHolder holder;
+    private RegistryHolder registryHolder;
 
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             findAllCustomersCommand = (FindAllCustomersCommand)
-                    holder.getRegistry().lookup(FindAllCustomersCommand.class.getSimpleName());
+                    registryHolder.getRegistry().lookup(FindAllCustomersCommand.class.getSimpleName());
         } catch (NotBoundException | RemoteException e) {
-            response.sendError(503, "RMI server not found");
+            resp.sendError(503, "RMI server not found");
         }
-		response.setContentType("text/html;charset=UTF-8");
-		try (PrintWriter out = response.getWriter()) {
+		resp.setContentType("text/html;charset=UTF-8");
+		try (PrintWriter out = resp.getWriter()) {
 			out.println("<!DOCTYPE html>");
 			out.println("<html><head>");
 			out.println("<head>\n" +
@@ -65,10 +65,15 @@ public class CustomersListServlet extends CustomServlet {
             out.println("<table>");
             out.println("<tr><th>ID</th><th>SSN</th><th>Customer Name</th><th>Address</th></tr>");
 			all.forEach(item -> {
-                out.println("<tr><td><a href=/customer?" + item.getId() + ">" + item.getId() + "</a></td>" + "<td>" +
-                                    item.getSsn() + "</td><td>" + item.getCustomerName() + "</td><td>" + item.getAddress() + "</td></tr>");
+                out.println("<tr><td><a href=/customer?" + item.getId() + ">" + item.getId() + "</a></td>"
+                                    + "<td>" + item.getSsn() + "</td><td>"
+                                    + item.getCustomerName() + "</td><td>"
+                                    + item.getAddress() + "</td></tr>");
             });
-			out.println("</table>");
+			out.println("</table><p>");
+			out.println("<a href=\"#\"></a> ");
+			out.println("</p><input type=\"submit\" value=\"Add New Customer\"\n" +
+                                "    onclick=\"window.location='/create'\"/> ");
 			out.println("</body>");
 			out.println("</html>");
 		} catch (Throwable throwable) {

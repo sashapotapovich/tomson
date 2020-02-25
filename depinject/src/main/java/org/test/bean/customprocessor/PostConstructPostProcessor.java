@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.test.di.annotations.Component;
 import org.test.di.annotations.PostConstruct;
 import org.test.di.config.BeanPostProcessor;
+import org.test.di.exceptions.InitializationException;
 
 @Component
 public class PostConstructPostProcessor implements BeanPostProcessor {
@@ -35,7 +36,7 @@ public class PostConstructPostProcessor implements BeanPostProcessor {
                     log.error(e.toString());
                 } catch (InvocationTargetException e) {
                     log.error(e.toString());
-                    throw new RuntimeException("Unable to initialize Bean - " + beanName);
+                    throw new InitializationException("Unable to initialize Bean - " + beanName, e);
                 }
             }
         }

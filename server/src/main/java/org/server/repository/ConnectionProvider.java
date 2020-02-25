@@ -11,11 +11,10 @@ import org.test.di.annotations.Component;
 import org.test.di.annotations.PostConstruct;
 
 @Slf4j
-@Component
+@Component(priority = 1)
 public class ConnectionProvider {
     
     private SessionFactory sessionFactory;
-    private Session session;
     
     @PostConstruct
     private void init(){
@@ -24,8 +23,6 @@ public class ConnectionProvider {
                 .build();
         try {
             sessionFactory = new MetadataSources(dbRegistry).buildMetadata().buildSessionFactory();
-            session = sessionFactory.openSession();
-            session.setHibernateFlushMode(FlushMode.COMMIT);
         } catch (Exception e) {
             StandardServiceRegistryBuilder.destroy(dbRegistry);
             log.error("cannot create sessionFactory", e);
@@ -34,10 +31,9 @@ public class ConnectionProvider {
     }
     
     public Session getSession(){
+        Session session = sessionFactory.openSession();
+        session.setHibernateFlushMode(FlushMode.COMMIT);
         return session;
     }
     
-    public SessionFactory getSessionFactory() {
-        return sessionFactory;
-    }
 }

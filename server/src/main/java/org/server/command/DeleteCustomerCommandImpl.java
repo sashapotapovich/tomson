@@ -21,8 +21,8 @@ public class DeleteCustomerCommandImpl implements DeleteCustomerCommand {
     }
 
     public CustomerTO execute(CustomerTO obj) throws RemoteException {
-        Customer deleted = customerRepository.findById(obj.getId());
-        customerRepository.delete(deleted);
-        return deleted;
+        Customer toDelete = customerRepository.findById(obj.getId());
+        customerRepository.delete(toDelete);
+        return toDelete;
     }
 }
