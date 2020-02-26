@@ -74,7 +74,8 @@ public class BeanFactory {
     private void forJar(String path) {
         File jarFile = null;
         try {
-            jarFile = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+            jarFile = new File(this.getClass().getProtectionDomain()
+                                   .getCodeSource().getLocation().toURI().getPath());
         } catch (URISyntaxException e) {
             log.error(e.toString());
         }

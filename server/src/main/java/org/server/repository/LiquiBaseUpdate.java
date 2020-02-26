@@ -1,9 +1,11 @@
 package org.server.repository;
 
-import java.net.URISyntaxException;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -40,14 +42,36 @@ public class LiquiBaseUpdate {
                                                .findCorrectDatabaseImplementation(
                                                        new JdbcConnection(c)
                                                );
-            URL pathToChangelog = LiquiBaseUpdate.class.getResource("/db/changelog.xml");
-            Path path = Paths.get(pathToChangelog.toURI());
-            liquibase = new Liquibase(path.toFile().getAbsolutePath(),
+            File file = null;
+            String resource = "/db/changelog.xml";
+            URL res = getClass().getResource(resource);
+            if (res.getProtocol().equals("jar")) {
+                try {
+                    InputStream input = getClass().getResourceAsStream(resource);
+                    file = File.createTempFile("tempfile", ".xml");
+                    OutputStream out = new FileOutputStream(file);
+                    int read;
+                    byte[] bytes = new byte[1024];
+
+                    while ((read = input.read(bytes)) != -1) {
+                        out.write(bytes, 0, read);
+                    }
+                    out.close();
+                    file.deleteOnExit();
+                } catch (IOException ex) {
+                    log.error("Temp file exception",ex);
+                }
+            } else {
+                //this will probably work in your IDE, but not from a JAR
+                file = new File(res.getFile());
+            }
+            if (file != null && !file.exists()) {
+                log.error("Error: File " + file + " not found!");
+            }
+            liquibase = new Liquibase(file.getAbsolutePath(),
                                       new FileSystemResourceAccessor(), database);
             liquibase.validate();
             liquibase.update(new Contexts("test"));
-        } catch (URISyntaxException e) {
-            log.info("ChangeSet not found:", e);
         } catch (LiquibaseException e) {
             c.rollback();
             log.info("Liquibase update failed:", e);
