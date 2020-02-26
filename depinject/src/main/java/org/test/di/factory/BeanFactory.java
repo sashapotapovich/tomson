@@ -50,12 +50,12 @@ public class BeanFactory {
                 if (instance instanceof BeanPostProcessor) {
                     BeanPostProcessor postProcessor = (BeanPostProcessor) instance;
                     addPostProcessor(postProcessor);
-                    //return;
                 }
-                Component component = classObject.getAnnotation(Component.class);
                 String beanName = className.substring(0, 1).toLowerCase() + className.substring(1);
                 log.info("Generated BEAN name - {}", beanName);
-                context.addBean(beanName, instance);
+                int priority = classObject.getAnnotation(Component.class).priority();
+                Bean bean = new Bean(priority, beanName, instance);
+                context.addBean(bean);
                 for (Field field : classObject.getDeclaredFields()) {
                     if (field.isAnnotationPresent(Autowired.class)) {
                         String classNameForAuto = field.getType().getSimpleName();
@@ -153,9 +153,9 @@ public class BeanFactory {
                                 if (!allBeansForType.isEmpty()) {
                                     String simpleName = field.getDeclaringClass().getSimpleName();
                                     simpleName = simpleName.substring(0, 1).toLowerCase() + simpleName.substring(1);
-                                    Object target = ServiceLocator.getBean(simpleName);
+                                    Bean target = ServiceLocator.getBean(simpleName);
                                     field.setAccessible(true);
-                                    field.set(target, allBeansForType);
+                                    field.set(target.getInstance(), allBeansForType);
                                     field.setAccessible(false);
                                 }
                             }
@@ -164,9 +164,9 @@ public class BeanFactory {
                         field.setAccessible(true);
                         String simpleName = field.getDeclaringClass().getSimpleName();
                         simpleName = simpleName.substring(0, 1).toLowerCase() + simpleName.substring(1);
-                        Object target = ServiceLocator.getBean(simpleName);
-                        Object bean = ServiceLocator.getBean(beanName);
-                        field.set(target, bean);
+                        Bean target = ServiceLocator.getBean(simpleName);
+                        Bean bean = ServiceLocator.getBean(beanName);
+                        field.set(target.getInstance(), bean.getInstance());
                         field.setAccessible(false);
                     }
                 }
@@ -178,11 +178,9 @@ public class BeanFactory {
 
     public void processBeforeBeanInitialization() {
         if (!postProcessors.isEmpty()) {
-            for (Object bean : context.getAllBeans()) {
-                String name = bean.getClass().getSimpleName();
-                name = name.substring(0, 1).toLowerCase() + name.substring(1);
+            for (Bean bean : context.getAllBeans()) {
                 for (BeanPostProcessor postProcessor : postProcessors) {
-                    postProcessor.postProcessBeforeInitialization(name, bean);
+                    postProcessor.postProcessBeforeInitialization(bean.getBeanName(), bean.getInstance());
                 }
             }
         }
@@ -190,22 +188,16 @@ public class BeanFactory {
 
     public void processAfterBeanInitialization() {
         if (!postProcessors.isEmpty()) {
-            for (Object bean : context.getAllBeans()) {
-                String name = bean.getClass().getSimpleName();
-                name = name.substring(0, 1).toLowerCase() + name.substring(1);
+            for (Bean bean : context.getAllBeans()) {
                 for (BeanPostProcessor postProcessor : postProcessors) {
-                    postProcessor.postProcessAfterInitialization(name, bean);
+                    postProcessor.postProcessAfterInitialization(bean.getBeanName(), bean.getInstance());
                 }
             }
         }
     }
 
-    public Object getBean(String beanName) {
+    public Bean getBean(String beanName) {
         return context.getBean(beanName);
-    }
-
-    public Collection<Object> getAllBeans() {
-        return context.getAllBeans();
     }
 
     public void close() {
