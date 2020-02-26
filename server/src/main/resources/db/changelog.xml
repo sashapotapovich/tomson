@@ -1,10 +1,93 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog
-		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <property name="schemaName" value="public" dbms="postgresql" global="true"/>
+    <changeSet author="PatapovichA" id="1582721777047-1" runAlways="true" context="test">
+        <createSequence sequenceName="hibernate_sequence" startValue="8" incrementBy="1"/>
+    </changeSet>
+    <changeSet author="PatapovichA" id="1582721762700-1" runAlways="true" context="test">
+        <createTable tableName="customer">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="pk_customer"/>
+            </column>
+            <column name="ssn" type="VARCHAR(15)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customername" type="VARCHAR(40)"/>
+            <column name="address" type="VARCHAR(100)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="PatapovichA" id="1582721762700-2" runAlways="true" context="test">
+        <addUniqueConstraint columnNames="ssn" constraintName="customer_ssn_key" tableName="customer"/>
+    </changeSet>
+    <changeSet id="2019-01-02-tables-stock" author="PatapovichA" runAlways="true" context="test">
+        <createTable tableName="stock">
+            <column name="symbol" type="varchar(8)">
+                <constraints primaryKey="true" primaryKeyName="pk_stock"/>
+            </column>
+            <column name="price" type="real"/>
+        </createTable>
+    </changeSet>
 
-	<!-- Should be only links to per-version cumulative changelog files. -->
-	<include file="v1.0/changelog-v1.0-cumulative.xml" relativeToChangelogFile="true"/>
-	<include file="default-values.xml" relativeToChangelogFile="true"/>
+    <changeSet id="2019-01-02-tables-shares" author="PatapovichA" runAlways="true" context="test">
+        <createTable tableName="shares">
+            <column name="shares_id" type="bigint">
+                <constraints primaryKey="true" primaryKeyName="pk_shares"/>
+            </column>
+            <column name="ssn" type="varchar(15)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="symbol" type="varchar(8)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="bigint"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="2019-01-03-default-values-001-customer" author="PatapovichA" runOnChange="true">
+        <preConditions onFail="MARK_RAN">
+            <tableIsEmpty schemaName="public" tableName="customer"/>
+        </preConditions>
+
+        <insert tableName="customer">
+            <column name="id" value="1"/>
+            <column name="ssn" value="ssn1"/>
+            <column name="customername" value="test1"/>
+            <column name="address" value="address1"/>
+        </insert>
+        <insert tableName="customer">
+            <column name="id" value="2"/>
+            <column name="ssn" value="ssn2"/>
+            <column name="customername" value="test2"/>
+            <column name="address" value="address2"/>
+        </insert>
+        <insert tableName="customer">
+            <column name="id" value="3"/>
+            <column name="ssn" value="ssn3"/>
+            <column name="customername" value="test3"/>
+            <column name="address" value="address3"/>
+        </insert>
+        <insert tableName="customer">
+            <column name="id" value="4"/>
+            <column name="ssn" value="ssn4"/>
+            <column name="customername" value="test4"/>
+            <column name="address" value="address4"/>
+        </insert>
+        <insert tableName="customer">
+            <column name="id" value="5"/>
+            <column name="ssn" value="ssn5"/>
+            <column name="customername" value="test5"/>
+            <column name="address" value="address5"/>
+        </insert>
+        <insert tableName="customer">
+            <column name="id" value="6"/>
+            <column name="ssn" value="ssn6"/>
+            <column name="customername" value="test6"/>
+            <column name="address" value="address6"/>
+        </insert>
+        <insert tableName="customer">
+            <column name="id" value="7"/>
+            <column name="ssn" value="ssn7"/>
+            <column name="customername" value="test7"/>
+            <column name="address" value="address7"/>
+        </insert>
+    </changeSet>
 </databaseChangeLog>
