@@ -45,6 +45,6 @@ public class PostConstructPostProcessor implements BeanPostProcessor {
 
     @Override
     public Integer getPriority() {
-        return 1;
+        return 2;
     }
 }

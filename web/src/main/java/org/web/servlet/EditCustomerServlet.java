@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.test.di.annotations.Autowired;
 import org.test.di.annotations.Component;
-import org.web.RegistryHolder;
+import org.web.controller.RegistryHolder;
 
 @Slf4j
 @Component

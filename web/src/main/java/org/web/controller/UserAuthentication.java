@@ -1,4 +1,4 @@
-package org.web;
+package org.web.controller;
 
 import com.sun.net.httpserver.Authenticator;
 import com.sun.net.httpserver.HttpExchange;
@@ -14,6 +14,7 @@ import javax.naming.ldap.LdapContext;
 import lombok.extern.slf4j.Slf4j;
 import org.test.di.annotations.Autowired;
 import org.test.di.annotations.Component;
+import org.test.di.annotations.Configuration;
 
 @Slf4j
 @Component
@@ -21,6 +22,16 @@ public class UserAuthentication extends Authenticator {
 
     @Autowired
     private RegistryHolder registryHolder;
+    @Configuration(prefix = "ldap")
+    private String contextFactory;
+    @Configuration(prefix = "ldap")
+    private String providerUrl;
+    @Configuration(prefix = "ldap")
+    private String securityAuth;
+    @Configuration(prefix = "ldap")
+    private String securityPrincipal;
+    @Configuration(prefix = "ldap")
+    private String securityCredentials;
     
     @Override
     public Result authenticate(HttpExchange exch) {
@@ -29,17 +40,15 @@ public class UserAuthentication extends Authenticator {
 
     public boolean authenticate(String user, String pwd) {
         Properties env = new Properties();
-        env.put(Context.INITIAL_CONTEXT_FACTORY,
-                "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.PROVIDER_URL, "ldap://ldap:10389/dc=springframework,dc=org");
-        env.put(Context.SECURITY_AUTHENTICATION, "simple");
-        env.put(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
-        env.put(Context.SECURITY_CREDENTIALS, "secret");
+        env.put(Context.INITIAL_CONTEXT_FACTORY, contextFactory);
+        env.put(Context.PROVIDER_URL, providerUrl);
+        env.put(Context.SECURITY_AUTHENTICATION, securityAuth);
+        env.put(Context.SECURITY_PRINCIPAL, securityPrincipal);
+        env.put(Context.SECURITY_CREDENTIALS, securityCredentials);
         try {
             LdapContext ctx = new InitialLdapContext(env, null);
             ctx.setRequestControls(null);
-            NamingEnumeration<SearchResult> search = ctx.search("uid=" + user
-                                                                        + ",ou=people",
+            NamingEnumeration<SearchResult> search = ctx.search("uid=" + user + ",ou=people",
                                                                 "(objectclass=person)",
                                                                 getSimpleSearchControls());
             if (search.hasMore()) {

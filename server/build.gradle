@@ -92,9 +92,9 @@ dependencies {
     liquibaseRuntime 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.2'
     liquibaseRuntime 'org.glassfish.jaxb:jaxb-runtime:2.3.2'*/
     implementation('javax.servlet:javax.servlet-api:3.0.1')
-    //implementation project(':common-module')
-    //compile project(':depinject')
-    compile fileTree(include: ['*.jar'], dir: 'libs/')
+    implementation project(':common-module')
+    compile project(':depinject')
+    //compile fileTree(include: ['*.jar'], dir: 'libs/')
     // JAX-B dependencies for JDK 9+
 /*    compile group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
     compile group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'*/

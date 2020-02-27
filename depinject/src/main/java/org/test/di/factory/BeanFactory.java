@@ -59,7 +59,8 @@ public class BeanFactory {
                 for (Field field : classObject.getDeclaredFields()) {
                     if (field.isAnnotationPresent(Autowired.class)) {
                         String classNameForAuto = field.getType().getSimpleName();
-                        String fieldName = classNameForAuto.substring(0, 1).toLowerCase() + classNameForAuto.substring(1);
+                        String fieldName = classNameForAuto.substring(0, 1).toLowerCase() 
+                                + classNameForAuto.substring(1);
                         autowireCandidates.computeIfAbsent(fieldName, k -> new ArrayList<>())
                                           .add(field);
                     }

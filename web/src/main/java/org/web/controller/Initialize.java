@@ -1,4 +1,4 @@
-package org.web;
+package org.web.controller;
 
 import com.sun.net.httpserver.BasicAuthenticator;
 import com.sun.net.httpserver.HttpContext;
@@ -9,20 +9,22 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.test.di.annotations.Autowired;
 import org.test.di.annotations.Component;
+import org.test.di.annotations.Configuration;
 import org.test.di.annotations.PostConstruct;
 import org.web.servlet.CustomServlet;
 import org.web.servlet.wrapper.HttpHandlerWithServletSupport;
 
-@Component
 @Slf4j
+@Component
 public class Initialize {
-            
-    @Autowired
-    List<CustomServlet> servlets;
     
+    @Autowired
+    private List<CustomServlet> servlets;
+    @Configuration(prefix = "server")
+    private int port;
+
     @PostConstruct
     public void run() throws IOException {
-        int port = 8090;
         log.info("Starting Server at port - {}", port);
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         servlets.forEach(customServlet -> log.info("{} servlet registered", customServlet.getPath()));
@@ -35,9 +37,8 @@ public class Initialize {
         log.info("Server is running");
     }
     
-    class CustomAuthenticator extends BasicAuthenticator{
-        
-        private UserAuthentication authentication = new UserAuthentication();
+    private static class CustomAuthenticator extends BasicAuthenticator {
+        private UserAuthentication authentication;
 
         public CustomAuthenticator(String realm) {
             super(realm);

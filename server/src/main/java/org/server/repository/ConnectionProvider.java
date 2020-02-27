@@ -8,18 +8,21 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.test.di.annotations.Component;
+import org.test.di.annotations.Configuration;
 import org.test.di.annotations.PostConstruct;
 
 @Slf4j
-@Component(priority = 1)
+@Component(priority = 2)
 public class ConnectionProvider {
     
     private SessionFactory sessionFactory;
+    @Configuration(prefix = "hibernate")
+    private String config;
     
     @PostConstruct
     private void init(){
         final StandardServiceRegistry dbRegistry = new StandardServiceRegistryBuilder()
-                .configure("hibernate.cfg.xml")
+                .configure(config)
                 .build();
         try {
             sessionFactory = new MetadataSources(dbRegistry).buildMetadata().buildSessionFactory();
