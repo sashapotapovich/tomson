@@ -9,7 +9,7 @@ public class Main {
 
     public static void main(String[] args) {
         log.info("Starting...");
-        ApplicationContext applicationContext = new ApplicationContext("org");
+        ApplicationContext.run();
     }
 
 }

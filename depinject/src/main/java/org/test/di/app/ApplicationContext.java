@@ -22,6 +22,10 @@ public class ApplicationContext {
         return bean.getInstance();
     }
     
+    public static ApplicationContext run(){
+        return new ApplicationContext("");
+    }
+    
     public BeanFactory getBeanFactory(){
         return beanFactoryFacade.getBeanFactory();
     }

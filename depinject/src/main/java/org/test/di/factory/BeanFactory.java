@@ -17,9 +17,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
+import org.reflections.Reflections;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.test.di.annotations.Autowired;
@@ -59,7 +63,7 @@ public class BeanFactory {
                 for (Field field : classObject.getDeclaredFields()) {
                     if (field.isAnnotationPresent(Autowired.class)) {
                         String classNameForAuto = field.getType().getSimpleName();
-                        String fieldName = classNameForAuto.substring(0, 1).toLowerCase() 
+                        String fieldName = classNameForAuto.substring(0, 1).toLowerCase()
                                 + classNameForAuto.substring(1);
                         autowireCandidates.computeIfAbsent(fieldName, k -> new ArrayList<>())
                                           .add(field);
@@ -104,40 +108,50 @@ public class BeanFactory {
 
 
     public void instantiate(String basePackage) {
-        try {
-            ClassLoader classLoader = ClassUtil.getClassLoader();
-            String path = basePackage.replace('.', '/');
-            log.info("Path created - {}", path);
-            Enumeration<URL> resourceUrls = classLoader.getResources(path);
-            while (resourceUrls.hasMoreElements()) {
-                URL url = resourceUrls.nextElement();
-                URI uri = url.toURI();
-                if (uri.isOpaque()) {
-                    log.info("We are in the JAR file, so will work with file system as with jar");
-                    forJar(path);
-                    return;
-                }
-                File file = new File(uri);
-                for (File classFile : file.listFiles()) {
-                    if (classFile.isDirectory()) {
-                        log.info("We located subderictory - {}", classFile.getAbsolutePath());
-                        instantiate(basePackage + "." + classFile.getName());
-                        continue;
+        if (basePackage != null && !basePackage.isBlank()) {
+            try {
+                ClassLoader classLoader = ClassUtil.getClassLoader();
+                String path = basePackage.replace('.', '/');
+                log.info("Path created - {}", path);
+                Enumeration<URL> resourceUrls = classLoader.getResources(path);
+                while (resourceUrls.hasMoreElements()) {
+                    URL url = resourceUrls.nextElement();
+                    URI uri = url.toURI();
+                    if (uri.isOpaque()) {
+                        log.info("We are in the JAR file, so will work with file system as with jar");
+                        forJar(path);
+                        return;
                     }
-                    log.info("Running for the file - {}", classFile.getAbsolutePath());
-                    String fileName = classFile.getName();
-                    String className = null;
-                    if (fileName.endsWith(".class")) {
-                        className = fileName.substring(0, fileName.lastIndexOf('.'));
+                    File file = new File(uri);
+                    for (File classFile : file.listFiles()) {
+                        if (classFile.isDirectory()) {
+                            log.info("We located subderictory - {}", classFile.getAbsolutePath());
+                            instantiate(basePackage + "." + classFile.getName());
+                            continue;
+                        }
+                        log.info("Running for the file - {}", classFile.getAbsolutePath());
+                        String fileName = classFile.getName();
+                        String className = null;
+                        if (fileName.endsWith(".class")) {
+                            className = fileName.substring(0, fileName.lastIndexOf('.'));
+                        }
+                        Class<?> classObject = Class.forName(basePackage + "." + className);
+                        registerBeans(classObject, className);
                     }
-                    Class<?> classObject = Class.forName(basePackage + "." + className);
-                    registerBeans(classObject, className);
                 }
+            } catch (IOException | ClassNotFoundException | URISyntaxException e) {
+                log.error(e.toString());
             }
-        } catch (IOException | ClassNotFoundException | URISyntaxException e) {
-            log.error(e.toString());
+        } else {
+            Reflections reflections = new Reflections(
+                    new ConfigurationBuilder().setUrls(ClasspathHelper.forJavaClassPath()));
+            Set<Class<?>> typesAnnotatedWith = reflections.getTypesAnnotatedWith(Component.class);
+            typesAnnotatedWith.forEach(clazz -> {
+                registerBeans(clazz, clazz.getSimpleName());
+            });
         }
     }
+
 
     public void populateProperties() {
         autowireCandidates.keySet().forEach(value -> log.info("Autowire Candidates held in list - {}", value));
