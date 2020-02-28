@@ -77,7 +77,6 @@ public class LiquiBaseUpdate {
         } finally {
             if (c != null) {
                 session.close();
-                c.close();
             }
         }
     }

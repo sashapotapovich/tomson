@@ -1,10 +1,10 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
     <property name="schemaName" value="public" dbms="postgresql" global="true"/>
-    <changeSet author="PatapovichA" id="1582721777047-1" runAlways="true" context="test">
+    <changeSet author="PatapovichA" id="1582721777047-1" context="test">
         <createSequence sequenceName="hibernate_sequence" startValue="8" incrementBy="1"/>
     </changeSet>
-    <changeSet author="PatapovichA" id="1582721762700-1" runAlways="true" context="test">
+    <changeSet author="PatapovichA" id="1582721762700-1" context="test">
         <createTable tableName="customer">
             <column name="id" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="pk_customer"/>
@@ -16,10 +16,10 @@
             <column name="address" type="VARCHAR(100)"/>
         </createTable>
     </changeSet>
-    <changeSet author="PatapovichA" id="1582721762700-2" runAlways="true" context="test">
+    <changeSet author="PatapovichA" id="1582721762700-2" context="test">
         <addUniqueConstraint columnNames="ssn" constraintName="customer_ssn_key" tableName="customer"/>
     </changeSet>
-    <changeSet id="2019-01-02-tables-stock" author="PatapovichA" runAlways="true" context="test">
+    <changeSet id="2019-01-02-tables-stock" author="PatapovichA" context="test">
         <createTable tableName="stock">
             <column name="symbol" type="varchar(8)">
                 <constraints primaryKey="true" primaryKeyName="pk_stock"/>
@@ -28,7 +28,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="2019-01-02-tables-shares" author="PatapovichA" runAlways="true" context="test">
+    <changeSet id="2019-01-02-tables-shares" author="PatapovichA" context="test">
         <createTable tableName="shares">
             <column name="shares_id" type="bigint">
                 <constraints primaryKey="true" primaryKeyName="pk_shares"/>
