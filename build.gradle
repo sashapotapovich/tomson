@@ -1,5 +1,4 @@
 plugins {
-    id 'java'
     id 'application'
 }
 
@@ -9,6 +8,4 @@ targetCompatibility = '11'
 
 
 dependencies {
-    compile project(':server')
-    compile project(':depinject')
 }
